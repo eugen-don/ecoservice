@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+##############################################################################
+#    Ecoservice Partner
+#    Copyright (c) 2014 ecoservice GbR (<http://www.ecoservice.de>).
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU Affero General Public License as
+#    published by the Free Software Foundation, either version 3 of the
+#    License, or (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU Affero General Public License for more details.
+#
+#    You should have received a copy of the GNU Affero General Public License
+#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+#    This program based on OpenERP.
+#    OpenERP, Open Source Management Solution
+#    Copyright (C) 2004-2010 Tiny SPRL (<http://tiny.be>).
+##############################################################################
+-->
+<openerp>
+	<data>
+		<!-- Partner -->
+		<record id="view_partner_form_inherit_ecoservice_name" model="ir.ui.view">
+            <field name="name">res.partner.form.inherit.ecoservice.name</field>
+            <field name="model">res.partner</field>
+            <field name='inherit_id' ref='base.view_partner_form'/>
+            <field name="arch" type="xml">
+            	<field name="name" default_focus="1" placeholder="Name" position='replace'>
+            		<field name="name" placeholder="Name" attrs="{'invisible': [('is_company','=', False)]}"/>
+	        		<field name="first_name" placeholder="First Name" attrs="{'invisible': [('is_company','=', True)]}"/>
+	        		<field name="last_name" placeholder="Last Name" attrs="{'invisible': [('is_company','=', True)]}"/>
+        		</field>
+            </field>
+		</record>
+
+		<record id="view_partner_form_inherit_ecoservice_name_contacts" model="ir.ui.view">
+            <field name="name">res.partner.form.inherit.ecoservice.name.contacts</field>
+            <field name="model">res.partner</field>
+            <field name='inherit_id' ref='base.view_partner_form'/>
+            <field name="arch" type="xml">
+                <xpath expr="/form/sheet/notebook/page/field[@name='child_ids']/form/sheet/div/h1/field[@name='name']" position="replace">
+	        		<field name="first_name" placeholder="First Name"/>
+	        		<field name="last_name" placeholder="Last Name"/>
+                </xpath>
+            </field>
+		</record>
+
+		<!-- Partner Title -->
+	    <record id="view_partner_title_form_inherit_ecoservice_partner_address_salutation" model="ir.ui.view">
+            <field name="name">res.partner.title.form.inherit.ecoservice_partner_address.salutation</field>
+            <field name="model">res.partner.title</field>
+            <field name="type">form</field>
+            <field name="inherit_id" ref="base.view_partner_title_form"/>
+            <field name="arch" type="xml">
+		       <field name="shortcut" position="after">
+		       		<field name='salutation'/>
+		       </field>
+            </field>
+       </record>
+	</data>
+</openerp>
+

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+	<data noupdate="True">
+		
+		<!-- Title - Salutation -->
+		<record id="ecoservice_partner_title_salutation" model="res.partner.title">
+		    <field name="domain">contact</field>
+		    <field name="name">TestTitle</field>
+		    <field name="salutation">TestSalutation</field>
+		    <field name="shortcut">TT-TS</field>
+		</record>
+		
+        <record id="ecoservice_test_partner" model="res.partner">
+        	<field name="first_name">Ecoservice</field>
+        	<field name="last_name">Test</field>
+        	<field name="name">Ecoservice Test</field>
+            <field name="company_id" eval="None"/>
+            <field name="image" eval="False"/>
+            <field name="customer" eval="True"/>
+            <field name="is_company" eval="False"/>
+            <field name="street"></field>
+            <field name="city"></field>
+            <field name="zip"></field>
+            <field name="phone"></field>
+            <field name="email">info@ecoservice.de</field>
+            <field name="website">www.ecoservice.de</field>
+            <field name="title" ref="ecoservice_partner_title_salutation"/>
+        </record>
+        
+        <record id="ecoservice_test_company" model="res.partner">
+            <field name="name">Ecoservice Test Company</field>
+            <field name="company_id" eval="None"/>
+            <field name="image" eval="False"/>
+            <field name="customer" eval="False"/>
+            <field name="is_company" eval="True"/>
+            <field name="street"></field>
+            <field name="city"></field>
+            <field name="zip"></field>
+            <field name="phone"></field>
+            <field name="email">info@ecoservice.de</field>
+            <field name="website">www.ecoservice.de</field>
+        </record>
+	</data>
+</openerp>
+
+	
