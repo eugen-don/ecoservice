@@ -23,7 +23,7 @@
 {# pylint: disable-msg=W0104
     "name" : "Ecoservice Financial Interface Datev",
     "version" : "1.0",
-    "depends" : ["ecoservice_financeinterface"],
+    "depends" : ["ecoservice_financeinterface", "mail"],
     "author" : "ecoservice",
     "website" : "www.ecoservice.de",
     "description": """The module ecoservice_financeinterface_datev provides methods to convert account moves to the Datevformat (Datev Dok.-Nr.: 1036228).
@@ -42,7 +42,7 @@ Further information under
                     'account_view.xml',
                     'account_cron.xml',
                     'res_company_view.xml',
-#                    'ecoservice_financeinterface_datev_installer_view.xml'
+                    'ecoservice_financeinterface_datev_installer_view.xml'
                     ],
     "demo_xml" : [],
     'test': [],

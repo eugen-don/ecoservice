@@ -170,6 +170,8 @@ class ecofi(osv.osv):
                     bookingdict['buchungsheader'] = self.buchungenHeaderDatev()    
                 faelligkeit = False  
                 for line in move.line_id:
+                    if line.debit == 0 and line.credit==0:
+                        continue
                     datevkonto = line.ecofi_account_counterpart.code
                     datevgegenkonto = ustr(line.account_id.code)
                     if datevgegenkonto == datevkonto:

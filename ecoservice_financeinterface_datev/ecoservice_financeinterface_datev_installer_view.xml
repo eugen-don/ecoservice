@@ -27,26 +27,19 @@
         <record id="view_ecoservice_financeinterface_datev_installer" model="ir.ui.view">
             <field name="name">ecoservice.financeinterface.datev.installer.view</field>
             <field name="model">ecoservice.financeinterface.datev.installer</field>
-            <field name="type">form</field>
             <field name="inherit_id" ref="base.res_config_installer"/>
             <field name="arch" type="xml">
-                <data>
-                    <form position="attributes">
-                        <attribute name="string">Migration of Account Moves for Datevexports</attribute>
-                    </form>
-                    <group colspan="8">
-                        <group colspan="2" col="2">
-                            <group colspan="6">
-                                <field name="migrate_datev" string="Migrate" colspan="1"/>
-                            </group>
-                        </group>
-                    </group>
-                </data>
+            	<form position="attributes">
+                    <attribute name="string">Installation</attribute>
+                </form>
+                <separator string="title" position="replace">
+                	<separator string="Installation"/>
+                </separator>
             </field>
         </record>
 
         <record id="action_ecoservice_financeinterface_datev_installer" model="ir.actions.act_window">
-            <field name="name">Datev Migration</field>
+            <field name="name">Datev Installation</field>
             <field name="type">ir.actions.act_window</field>
             <field name="res_model">ecoservice.financeinterface.datev.installer</field>
             <field name="view_id" ref="view_ecoservice_financeinterface_datev_installer"/>
@@ -57,8 +50,8 @@
 
         <record id="ecoservice_financeinterface_datev_todo" model="ir.actions.todo">
             <field name="action_id" ref="action_ecoservice_financeinterface_datev_installer"/>
-            <field name="sequence">3</field>
-            <field name="restart">always</field>
+            <field name="sequence">2</field>
+            <field name="type">automatic</field>
         </record>
 
     </data>
