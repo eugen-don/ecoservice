@@ -22,12 +22,13 @@
 #    OpenERP, Open Source Management Solution
 #    Copyright (C) 2004-2010 Tiny SPRL (<http://tiny.be>).
 ##############################################################################
-from osv import osv
+from openerp.osv import osv
 from decimal import Decimal
-from tools.translate import _
-from tools import ustr
-import netsvc
-logger = netsvc.Logger()
+from openerp.tools.translate import _
+from openerp.tools import ustr
+from openerp import workflow
+import logging
+_logger = logging.getLogger(__name__)
 
 
 class ecofi(osv.osv):
@@ -43,12 +44,12 @@ class ecofi(osv.osv):
         """
         if context is None:
             context = {}
-        logger.notifyChannel('ecoservice_financeinterface', netsvc.LOG_INFO, "Starting Move Migration")
+        _logger.info("Starting Move Migration")
         invoice_ids = self.pool.get('account.invoice').search(cr, uid, [])
         counter = 0
         for invoice in self.pool.get('account.invoice').browse(cr, uid, invoice_ids, context=context):
             counter += 1
-            logger.notifyChannel('ecoservice_financeinterface', netsvc.LOG_INFO, _("Migrate Move %s / %s") % (counter, len(invoice_ids)))
+            _logger.info(_("Migrate Move %s / %s") % (counter, len(invoice_ids)))
             if invoice.move_id:
                 self.pool.get('account.move').write(cr, uid, [invoice.move_id.id], {
                                    'ecofi_buchungstext': invoice.ecofi_buchungstext or False,
@@ -61,7 +62,7 @@ class ecofi(osv.osv):
                                 if move_line.debit + move_line.credit == abs(invoice_line.price_subtotal):
                                     self.pool.get('account.move.line').write(cr, uid, [move_line.id],
                                                             {'ecofi_taxid': invoice_line.invoice_line_tax_id[0].id})
-        logger.notifyChannel('ecoservice_financeinterface', netsvc.LOG_INFO, _("Move Migration Finished"))
+        _logger.info(_("Move Migration Finished"))
         return True
 
     def field_config(self, cr, uid, move, line, errorcount, partnererror, thislog, thismovename, faelligkeit, datevdict):
@@ -180,7 +181,6 @@ class ecofi(osv.osv):
                     lineumsatz = Decimal(str(0))
                     lineumsatz += Decimal(str(line.debit))
                     lineumsatz -= Decimal(str(line.credit))
-                    context['waehrung'] = False
                     if line.amount_currency != 0:
                         lineumsatz = Decimal(str(line.amount_currency))
                         context['waehrung'] = True
@@ -201,7 +201,7 @@ class ecofi(osv.osv):
                                  'Umsatz': umsatz, 
                                  'Gegenkonto': datevgegenkonto, 
                                  'Datum':'',
-                                 'Konto': datevkonto, 
+                                 'Konto': datevkonto or '', 
                                  'Beleg1':'', 
                                  'Beleg2':'',
                                  'Waehrung':'', 

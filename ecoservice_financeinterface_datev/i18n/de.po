@@ -159,12 +159,3 @@ msgid "The account is an Autoaccount, altough the taxaccount (%s) in the movelin
 msgstr "Das Konto ist als Automatikkonto definiert, allerdings unterscheidet sich die Steuer (%s) in Buchungszeile %s von der vorkonfigurierten %s!\n"
 ""
 
-#. module: ecoservice_financeinterface_datev
-#: field:account.model.line,ecofi_account_counterpart:0
-msgid "Account Counterpart"
-msgstr "Gegenkonto"
-
-#. module: ecoservice_financeinterface_datev
-#: field:account.model.line,ecofi_taxid:0
-msgid "Move Tax"
-msgstr "Steuer"

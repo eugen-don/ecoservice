@@ -26,8 +26,6 @@ from openerp.osv import fields, osv
 from openerp.tools.translate import _
 from openerp.tools import ustr
 from decimal import Decimal
-import time
-from datetime import datetime
 
 class account_account(osv.osv):
     """Inherits the account.account class and adds attributes
@@ -88,8 +86,6 @@ class account_move(osv.osv):
             linecount += 1
             if line.account_id.id != line.ecofi_account_counterpart.id:
                 if not self.pool.get('ecofi').is_taxline(cr, line.account_id.id) or line.ecofi_bu == 'SD':
-                    if line.debit + line.credit == 0:
-                        continue
                     linetax = self.pool.get('ecofi').get_line_tax(cr, uid, line)
                     if line.account_id.automatic is True and not line.account_id.datev_steuer:
                         error += _("""The account %s is an Autoaccount, although the automatic taxes are not configured!\n""") % (line.account_id.code)                        
@@ -124,7 +120,7 @@ class account_move(osv.osv):
                         else:
                             error += _("""The Account is an Autoaccount, although the moveline %s has no tax!\n""") % (linecount)
         return error
-    
+
     def datev_tax_check(self, cr, uid, move, context={}):
         error = ''
         linecount = 0
@@ -141,12 +137,13 @@ class account_move(osv.osv):
                     tax_values[line.account_id.code]['real'] += line.debit - line.credit 
                 else:
                     linecounter += 1
-                    context['return_calc'] = True
-                    taxcalc_ids = self.pool.get('ecofi').calculate_tax(cr, uid, line, context)
+                    new_context = context.copy()
+                    new_context['return_calc'] = True
+                    taxcalc_ids = self.pool.get('ecofi').calculate_tax(cr, uid, line, new_context)
                     for taxcalc_id in taxcalc_ids:
                         taxaccount = taxcalc_id['account_paid_id'] and taxcalc_id['account_paid_id'] or taxcalc_id['account_collected_id']
                         if taxaccount:
-                            datev_account_code = self.pool.get('account.account').read(cr, uid, taxaccount, context=context)['code']           
+                            datev_account_code = self.pool.get('account.account').read(cr, uid, taxaccount, context=new_context)['code']           
                             if datev_account_code not in tax_values:
                                 tax_values[datev_account_code] = {'real': 0.00,
                                                                  'datev': 0.00,
@@ -200,105 +197,3 @@ class account_move_line(osv.osv):
                     ], 'Datev BU', select=True),
                 }
 account_move_line()
-
-class account_model_line(osv.osv):
-    _inherit = "account.model.line"
-    _columns = {
-                'ecofi_bu': fields.selection([
-                    ('40', '40'),
-                    ('SD', 'Steuer Direkt'),
-                    ], 'Datev BU', select=True),
-                'ecofi_taxid': fields.many2one('account.tax', 'Move Tax'),
-                'ecofi_account_counterpart': fields.many2one('account.account', 'Account Counterpart', ondelete='restrict', select=2),
-    }
-account_model_line()
-
-class account_model(osv.osv):
-    _inherit = "account.model"
-
-
-    def generate(self, cr, uid, ids, data=None, context=None):
-        super(account_model,self).generate(cr, uid, ids, data=data, context=context)
-        if data is None:
-            data = {}
-        move_ids = []
-        entry = {}
-        account_move_obj = self.pool.get('account.move')
-        account_move_line_obj = self.pool.get('account.move.line')
-        pt_obj = self.pool.get('account.payment.term')
-        period_obj = self.pool.get('account.period')
-
-        if context is None:
-            context = {}
-
-        if data.get('date', False):
-            context.update({'date': data['date']})
-
-        move_date = context.get('date', time.strftime('%Y-%m-%d'))
-        move_date = datetime.strptime(move_date,"%Y-%m-%d")
-        for model in self.browse(cr, uid, ids, context=context):
-            ctx = context.copy()
-            ctx.update({'company_id': model.company_id.id, 'account_period_prefer_normal': True})
-            period_ids = period_obj.find(cr, uid, dt=context.get('date', False), context=ctx)
-            period_id = period_ids and period_ids[0] or False
-            ctx.update({'journal_id': model.journal_id.id,'period_id': period_id})
-            try:
-                entry['name'] = model.name%{'year': move_date.strftime('%Y'), 'month': move_date.strftime('%m'), 'date': move_date.strftime('%Y-%m')}
-            except:
-                raise osv.except_osv(_('Wrong Model!'), _('You have a wrong expression "%(...)s" in your model!'))
-            move_id = account_move_obj.create(cr, uid, {
-                'ref': entry['name'],
-                'period_id': period_id,
-                'journal_id': model.journal_id.id,
-                'date': context.get('date', fields.date.context_today(self,cr,uid,context=context))
-            })
-            move_ids.append(move_id)
-            for line in model.lines_id:
-                analytic_account_id = False
-                if line.analytic_account_id:
-                    if not model.journal_id.analytic_journal_id:
-                        raise osv.except_osv(_('No Analytic Journal!'),_("You have to define an analytic journal on the '%s' journal!") % (model.journal_id.name,))
-                    analytic_account_id = line.analytic_account_id.id
-                val = {
-                    'move_id': move_id,
-                    'journal_id': model.journal_id.id,
-                    'period_id': period_id,
-                    'analytic_account_id': analytic_account_id
-                }
-
-                date_maturity = context.get('date',time.strftime('%Y-%m-%d'))
-                if line.date_maturity == 'partner':
-                    if not line.partner_id:
-                        raise osv.except_osv(_('Error!'), _("Maturity date of entry line generated by model line '%s' of model '%s' is based on partner payment term!" \
-                                                                "\nPlease define partner on it!")%(line.name, model.name))
-
-                    payment_term_id = False
-                    if model.journal_id.type in ('purchase', 'purchase_refund') and line.partner_id.property_supplier_payment_term:
-                        payment_term_id = line.partner_id.property_supplier_payment_term.id
-                    elif line.partner_id.property_payment_term:
-                        payment_term_id = line.partner_id.property_payment_term.id
-                    if payment_term_id:
-                        pterm_list = pt_obj.compute(cr, uid, payment_term_id, value=1, date_ref=date_maturity)
-                        if pterm_list:
-                            pterm_list = [l[0] for l in pterm_list]
-                            pterm_list.sort()
-                            date_maturity = pterm_list[-1]
-
-                val.update({
-                    'name': line.name,
-                    'quantity': line.quantity,
-                    'debit': line.debit,
-                    'credit': line.credit,
-                    'account_id': line.account_id.id,
-                    'move_id': move_id,
-                    'partner_id': line.partner_id.id,
-                    'date': context.get('date', fields.date.context_today(self,cr,uid,context=context)),
-                    'date_maturity': date_maturity,
-                    'ecofi_account_counterpart': line.ecofi_account_counterpart.id,
-                    'ecofi_taxid': line.ecofi_taxid.id,
-                    'ecofi_bu': line.ecofi_bu
-                })
-                account_move_line_obj.create(cr, uid, val, context=ctx)
-
-        return move_ids
-account_model()

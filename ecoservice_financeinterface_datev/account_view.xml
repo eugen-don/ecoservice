@@ -72,41 +72,11 @@
             <field name="type">form</field>
         	<field name="inherit_id" ref="ecoservice_financeinterface.view_move_form_inherit_ecofi2"/>
         	<field name="arch" type="xml">
-        		<xpath expr="/form/sheet/notebook/page/field/tree/field[@name='ecofi_taxid']" position="after">
+        		<xpath expr="/form/notebook/page/field/tree/field[@name='ecofi_taxid']" position="after">
         			<field name="ecofi_bu" select="2"/>
         		</xpath>
         	</field>
     	</record>
-
-		<!-- Account Model Line -->        
-        <record id="view_model_line_tree_inherit_ecofi_datev" model="ir.ui.view">
-            <field name="name">account.model.line.tree.inherit.ecofi.datev</field>
-            <field name="model">account.model.line</field>
-            <field name="inherit_id" ref="account.view_model_line_tree"/>
-            <field name="type">tree</field>
-            <field name="arch" type="xml">
-            	<xpath expr="/tree/field[@name='credit']" position="after">
-        			<field name="ecofi_account_counterpart" select="2"/>
-        			<field name="ecofi_taxid"/>
-        			<field name="ecofi_bu" select="2"/>
-        		</xpath>
-            </field>
-        </record>
-
-        <record id="view_model_line_form_inherit_ecofi_datev" model="ir.ui.view">
-            <field name="name">account.model.line.form.inherit.ecofi.datev</field>
-            <field name="model">account.model.line</field>
-            <field name="inherit_id" ref="account.view_model_line_form"/>
-            <field name="type">form</field>
-            <field name="arch" type="xml">
-            	<xpath expr="/form/group/field[@name='credit']" position="after">
-        			<field name="ecofi_account_counterpart" select="2"/>
-        			<field name="ecofi_taxid"/>
-        			<field name="ecofi_bu" select="2"/>
-        		</xpath>
-            </field>
-        </record>
-
    	</data>
 </openerp>
 	
