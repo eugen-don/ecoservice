@@ -277,12 +277,12 @@ class account_invoice(osv.osv):
                                 })
         return thisreturn
 
-    def inv_line_characteristic_hashcode(self, invoice, invoice_line):
+    def inv_line_characteristic_hashcode(self, invoice_line):
         """Transfers the line tax to the hash code
         :param invoice: Invoice Object
         :param invoice_line: Invoice Line Object
         """
-        res = super(account_invoice, self).inv_line_characteristic_hashcode(invoice, invoice_line)
+        res = super(account_invoice, self).inv_line_characteristic_hashcode(invoice_line)
         res += "-%s" % (invoice_line.get('ecofi_taxid', "False"))
         return res
 
