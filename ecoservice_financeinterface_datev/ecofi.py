@@ -181,7 +181,8 @@ class ecofi(osv.osv):
                     lineumsatz = Decimal(str(0))
                     lineumsatz += Decimal(str(line.debit))
                     lineumsatz -= Decimal(str(line.credit))
-                    if line.amount_currency != 0:
+                    context['waehrung'] = False
+                    if line.amount_currency != 0.0:
                         lineumsatz = Decimal(str(line.amount_currency))
                         context['waehrung'] = True
                     buschluessel = ''  
