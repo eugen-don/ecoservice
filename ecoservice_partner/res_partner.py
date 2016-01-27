@@ -118,3 +118,4 @@ class res_partner_title(models.Model):
     _inherit = 'res.partner.title'
     
     salutation = fields.Char('Salutation', size=128, translate=True)
+    gender  = fields.Selection((('male','male'),('female','female')))

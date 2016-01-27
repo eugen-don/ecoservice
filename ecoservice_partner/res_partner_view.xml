@@ -58,7 +58,9 @@
             <field name="inherit_id" ref="base.view_partner_title_form"/>
             <field name="arch" type="xml">
 		       <field name="shortcut" position="after">
-		       		<field name='salutation'/>
+		       	 <field name='salutation'/>
+                 <field name="domain" invisible="1"/>
+                 <field name="gender" attrs="{'invisible' : [('domain','!=','contact')]}"/>
 		       </field>
             </field>
        </record>

@@ -16,6 +16,21 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. module: ecoservice_partner
+#: selection:res.partner.title,gender:0
+msgid "female"
+msgstr "weiblich"
+
+#. module: ecoservice_partner
+#: field:res.partner.title,gender:0
+msgid "Gender"
+msgstr "Geschlecht"
+
+#. module: ecoservice_partner
+#: selection:res.partner.title,gender:0
+msgid "male"
+msgstr "männlich"
+
+#. module: ecoservice_partner
 #: view:res.partner:ecoservice_partner.view_partner_form_inherit_ecoservice_name
 #: view:res.partner:ecoservice_partner.view_partner_form_inherit_ecoservice_name_contacts
 #: field:res.partner,first_name:0
