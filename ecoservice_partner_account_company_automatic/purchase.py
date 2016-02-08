@@ -38,6 +38,7 @@ class purchase_order(osv.osv):
                     default_property_id = self.pool.get('ir.property').search(cr, uid, ['&',('name','=','property_account_payable'), ('res_id','=',None)])
                     if default_property_id:
                         if default_property_id == partner_default_property_id:
-                            context['type'] = 'payable'
-                            self.pool.get('res.partner').create_accounts(cr, uid, [vals['partner_id']], context=context)
+                            ctx = dict(context)
+                            ctx['type'] = 'payable'
+                            self.pool.get('res.partner').create_accounts(cr, uid, [vals['partner_id']], context=ctx)
         return res
