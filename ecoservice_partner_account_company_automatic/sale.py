@@ -23,21 +23,27 @@
 
 from openerp.osv import fields, osv
 
-class sale_order(osv.osv):
 
+class sale_order(osv.osv):
     _inherit = "sale.order"
 
-    def create(self, cr, uid, vals, context=None):
+    def create (self, cr, uid, vals, context=None):
         res = super(sale_order, self).create(cr, uid, vals, context=context)
         if vals.get('partner_id'):
-            partner = self.pool.get('res.partner').read(cr, uid, vals['partner_id'], ['property_account_receivable_id'], context=context)
+            partner = self.pool.get('res.partner').read(cr, uid, vals['partner_id'], ['property_account_receivable_id'],
+                                                        context=context)
             if partner:
                 partner_default_id = partner['property_account_receivable_id'][0]
                 if partner_default_id:
-                    partner_default_property_id = self.pool.get('ir.property').search(cr, uid, ['&',('name','=','property_account_receivable_id'), ('res_id','=',None), ('value_reference','=','account.account,%s' %(partner_default_id))])
-                    default_property_id = self.pool.get('ir.property').search(cr, uid, ['&',('name','=','property_account_receivable_id'), ('res_id','=',None)])
+                    partner_default_property_id = self.pool.get('ir.property').search(cr, uid, ['&', (
+                        'name', '=', 'property_account_receivable_id'), ('res_id', '=', None), ('value_reference', '=',
+                                                                                                'account.account,%s' % (
+                                                                                                    partner_default_id))])
+                    default_property_id = self.pool.get('ir.property').search(cr, uid, ['&', (
+                        'name', '=', 'property_account_receivable_id'), ('res_id', '=', None)])
                     if default_property_id:
                         if default_property_id == partner_default_property_id:
-                            context['type'] = 'receivable'
-                            self.pool.get('res.partner').create_accounts(cr, uid, [vals['partner_id']], context=context)
+                            ctx = dict(context)
+                            ctx['type'] = 'receivable'
+                            self.pool.get('res.partner').create_accounts(cr, uid, [vals['partner_id']], context=ctx)
         return res
