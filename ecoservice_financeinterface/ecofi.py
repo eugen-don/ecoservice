@@ -309,7 +309,7 @@ class ecofi(osv.osv):
             :class:`ecoservice_financeinterface.wizard.export_ecofi_buchungsaetze.export_ecofi`
         """
         buf = cStringIO.StringIO()
-        ecofi_csv = csv.writer(buf, delimiter=';', quotechar='"')
+        ecofi_csv = csv.writer(buf, delimiter=';', quotechar='"', quoting=csv.QUOTE_ALL)
         partnererror = []
         buchungserror = []
         exportmethod = ''
