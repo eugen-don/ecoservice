@@ -39,7 +39,7 @@ class AccountInvoice(models.Model):
         return self.enable_datev_checks and self.env['res.users'].browse(self._uid).company_id.enable_datev_checks
 
     @api.multi
-    def perform_datev_tax_validation(self, throw_exception=False):
+    def perform_datev_validation(self, throw_exception=False):
         is_validated = True
         error_list = []
 
@@ -47,7 +47,7 @@ class AccountInvoice(models.Model):
             if rec.is_datev_validation_active():
                 for no, line in enumerate(rec.invoice_line):
                     try:
-                        line.perform_datev_tax_validation(throw_exception=throw_exception, line_no=no+1)
+                        line.perform_datev_validation(throw_exception=throw_exception, line_no=no + 1)
                     except exceptions.DatevWarning as dw:
                         is_validated = False
                         error_list.append(dw.message)
@@ -62,7 +62,7 @@ class AccountInvoiceLine(models.Model):
     _inherit = 'account.invoice.line'
 
     @api.multi
-    def perform_datev_tax_validation(self, throw_exception=False, line_no=None):
+    def perform_datev_validation(self, throw_exception=False, line_no=None):
         """
         Performs tests on an invoice line for whether the taxes are correctly set or not.
 
@@ -75,7 +75,7 @@ class AccountInvoiceLine(models.Model):
         :rtype: bool
         """
         self.ensure_one()
-        if not self.perform_datev_tax_validation_applicability_check():
+        if not self.perform_datev_validation_applicability_check():
             return True
         is_applicable = len(self.invoice_line_tax_id) == 1 and self.account_id.datev_steuer == self.invoice_line_tax_id
         if throw_exception and not is_applicable:
@@ -87,7 +87,7 @@ class AccountInvoiceLine(models.Model):
         return is_applicable
 
     @api.multi
-    def perform_datev_tax_validation_applicability_check(self):
+    def perform_datev_validation_applicability_check(self):
         """
         Tests if an invoice line is applicable to datev checks or not.
 

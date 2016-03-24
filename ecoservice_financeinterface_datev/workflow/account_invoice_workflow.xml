@@ -28,7 +28,7 @@
       <field name="act_from" ref="account.act_draft"/>
       <field name="act_to" ref="account.act_open"/>
       <field name="signal">invoice_open</field>
-      <field name="condition">perform_datev_tax_validation()</field>
+      <field name="condition">perform_datev_validation()</field>
     </record>
 
   </data>
