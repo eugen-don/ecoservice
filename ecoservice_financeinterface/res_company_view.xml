@@ -23,22 +23,23 @@
 ##############################################################################
 -->
 <openerp>
-    <data>
-        <record model="ir.ui.view" id="view_company_form_inherit_financeinterface">
-            <field name="name">res.company.form.inherit.financeinterface</field>
-            <field name="inherit_id" ref="base.view_company_form"/>
-            <field name="model">res.company</field>
-            <field name="type">form</field>
-            <field name="arch" type="xml">
-	            <page string="Configuration" position="after">
-	            	<page string="Financeinterface">
-	            		<group>
-	                	<field name="finance_interface" colspan ="4"/>
-	                	<field name="journal_ids" colspan ="4"/>
-	                	</group>
-	            	</page>
-	            </page>
-            </field>
-        </record>
-   	</data>
+  <data>
+
+    <record model="ir.ui.view" id="view_company_form_inherit_financeinterface">
+      <field name="name">res.company.form.inherit.financeinterface</field>
+      <field name="model">res.company</field>
+      <field name="inherit_id" ref="base.view_company_form"/>
+      <field name="arch" type="xml">
+        <page string="Configuration" position="after">
+          <page string="Financeinterface">
+            <group>
+              <field name="finance_interface"/>
+              <field name="journal_ids"/>
+            </group>
+          </page>
+        </page>
+      </field>
+    </record>
+
+  </data>
 </openerp>
