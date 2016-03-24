@@ -49,4 +49,4 @@ class ResCompany(models.Model):
         ('netto', 'netto'),
         ('brutto', 'brutto')
     ], 'Exportmethod')
-    enable_datev_checks = fields.Boolean('Perform Datev Checks')
+    enable_datev_checks = fields.Boolean('Perform Datev Checks', default=True)
