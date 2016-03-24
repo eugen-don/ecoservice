@@ -77,6 +77,12 @@ class account_move(osv.osv):
     """ Inherits the account.move class to add checkmethods to the original post methode
     """
     _inherit = "account.move"
+    _columns = {
+        'enable_datev_checks': fields.boolean('Perform Datev checks')
+    }
+    _defaults = {
+        'enable_datev_checks': True
+    }
 
     def datev_account_checks(self, cr, uid, move, context={}):
         error = ''
@@ -88,7 +94,7 @@ class account_move(osv.osv):
                 if not self.pool.get('ecofi').is_taxline(cr, line.account_id.id) or line.ecofi_bu == 'SD':
                     linetax = self.pool.get('ecofi').get_line_tax(cr, uid, line)
                     if line.account_id.automatic is True and not line.account_id.datev_steuer:
-                        error += _("""The account %s is an Autoaccount, although the automatic taxes are not configured!\n""") % (line.account_id.code)                        
+                        error += _("""The account %s is an Autoaccount, although the automatic taxes are not configured!\n""") % (line.account_id.code)
                     if line.account_id.datev_steuer_erforderlich is True and linetax is False:
                         error += _("""The Account requires a tax, although the moveline %s has no tax!\n""") % (linecount)
                     if line.account_id.automatic is True and linetax:
@@ -101,11 +107,11 @@ class account_move(osv.osv):
                                 error += _("""The account is an Autoaccount, altough the taxaccount (%s) in the moveline %s is an other than the configured %s!\n""") % (linecount,
                                                         linetax.name, line.account_id.datev_steuer.name)
                     if line.account_id.automatic is True and linetax is False:
-                        error += _("""The account is an Autoaccount, altough the taxaccount in the moveline %s is not set!\n""") % (linecount)                        
+                        error += _("""The account is an Autoaccount, altough the taxaccount in the moveline %s is not set!\n""") % (linecount)
                     if line.account_id.automatic is False and linetax and linetax.buchungsschluessel < 0:  # pylint: disable-msg=E1103
                         error += _(ustr("""The bookingkey for the tax %s is not configured!\n""")) % (linetax.name)  # pylint: disable-msg=E1103,C0301
         return error
-    
+
     def update_line_autoaccounts_tax(self, cr, uid, move, context={}):
         error = ''
         linecount = 0
@@ -134,7 +140,7 @@ class account_move(osv.osv):
                         tax_values[line.account_id.code] = {'real': 0.00,
                                                          'datev': 0.00,
                                                          }
-                    tax_values[line.account_id.code]['real'] += line.debit - line.credit 
+                    tax_values[line.account_id.code]['real'] += line.debit - line.credit
                 else:
                     linecounter += 1
                     new_context = context.copy()
@@ -143,7 +149,7 @@ class account_move(osv.osv):
                     for taxcalc_id in taxcalc_ids:
                         taxaccount = taxcalc_id['account_paid_id'] and taxcalc_id['account_paid_id'] or taxcalc_id['account_collected_id']
                         if taxaccount:
-                            datev_account_code = self.pool.get('account.account').read(cr, uid, taxaccount, context=new_context)['code']           
+                            datev_account_code = self.pool.get('account.account').read(cr, uid, taxaccount, context=new_context)['code']
                             if datev_account_code not in tax_values:
                                 tax_values[datev_account_code] = {'real': 0.00,
                                                                  'datev': 0.00,
@@ -154,14 +160,13 @@ class account_move(osv.osv):
         for tax in tax_values:
             if Decimal(str(abs(tax_values[tax]['real'] - tax_values[tax]['datev']))) > Decimal(str(10 ** -2 * linecounter)):
                 error += _("""The Value for the tax on taxaccount %s is different between booked %s and calculated %s!\n""" % (tax, tax_values[tax]['real'], tax_values[tax]['datev']))
-        return error        
-     
+        return error
+
     def datev_checks(self, cr, uid, move, context={}):
         """Constraintcheck if export method is 'brutto'
         :param cr: the current row, from the database cursor
         :param uid: the current user’s ID for security checks
         :param move: account_move
-        :param ecofikonto: main account of the move
         :param context: context arguments, like lang, time zone
         """
         error = ''
@@ -174,14 +179,15 @@ class account_move(osv.osv):
         return error
 
     def finance_interface_checks(self, cr, uid, ids, context=None):
-        if context is None:
-            context = {}
-        res = super(account_move, self).finance_interface_checks(cr, uid, ids, context=context)
-        for move in self.browse(cr, uid, ids, context=context):
-            thiserror = ''
-            error = self.datev_checks(cr, uid, move, context)
-            if error:
-                raise osv.except_osv('Error', error)
+        context = context or dict()
+        res = True
+        if 'invoice' in context and context['invoice'].enable_datev_checks:
+            for move in self.browse(cr, uid, ids, context=context):
+                if move.enable_datev_checks and self.pool.get('res.users').browse(cr, uid, uid, context=context).company_id.enable_datev_checks:
+                    res &= super(account_move, self).finance_interface_checks(cr, uid, ids, context=context)
+                    error = self.datev_checks(cr, uid, move, context)
+                    if error:
+                        raise osv.except_osv('Error', error)
         return res
 
 account_move()
