@@ -23,31 +23,30 @@
 #    Copyright (C) 2004-2010 Tiny SPRL (<http://tiny.be>).
 ##############################################################################
 
-from openerp.osv import osv
-from openerp.osv import fields
+from openerp import api, fields, models
 
 
-class res_company(osv.osv):
+class ResCompany(models.Model):
     """ Inherits the res.company class and adds methods and attributes
 
     .. automethod:: _finance_interface_selection
     """
-    _inherit = "res.company"
+    _inherit = 'res.company'
 
-    def _finance_interface_selection(self, cr, uid, context={}):
+    @api.multi
+    def _finance_interface_selection(self):
         """Appends datev as possible export format
 
         .. seealso::
             :class:`ecoservice_financeinterface.ecofi.ecofi.ecofi_buchungen`
         """
-        res = super(res_company, self)._finance_interface_selection(cr, uid, context=context)
+        res = super(ResCompany, self)._finance_interface_selection()
         res.append(('datev', 'Datev'))
         return res
 
-    _columns = {
-                'finance_interface': fields.selection(_finance_interface_selection, 'Finance Interface'),
-                'exportmethod': fields.selection([
-                    ('netto', 'netto'),
-                    ('brutto', 'brutto'),], 'Exportmethod'),
-    }
-res_company()
+    finance_interface = fields.Selection(_finance_interface_selection, 'Finance Interface')
+    exportmethod = fields.Selection([
+        ('netto', 'netto'),
+        ('brutto', 'brutto')
+    ], 'Exportmethod')
+    enable_datev_checks = fields.Boolean('Perform Datev Checks')
