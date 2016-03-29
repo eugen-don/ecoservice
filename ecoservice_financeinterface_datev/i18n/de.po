@@ -25,7 +25,7 @@ msgstr "Datev UST-ID"
 #: help:account.account,ustuebergabe:0
 #: code:addons/ecoservice_financeinterface_datev/account.py:0
 msgid "Is required when transferring a sales tax identification number from the account partner (e.g. EU-Invoice)"
-msgstr "Wird benötigt, wenn eine Steueridentifikationsnummer  (z.B. EU-Rechnung)"
+msgstr "Wird benötigt, wenn eine Umsatzsteueridentifikationsnummer  (z.B. EU-Rechnung)"
 
 #. module: ecoservice_financeinterface_datev
 #: field:account.account,automatic:0
@@ -58,6 +58,7 @@ msgstr "Datev Zahlungsschlüssel"
 #. module: ecoservice_financeinterface_datev
 #: field:account.move,enable_datev_checks
 #: field:account.invoice,enable_datev_checks
+#: field:res.company,enable_datev_checks
 msgid "Perform Datev checks"
 msgstr "Datev-Checks durchführen"
 
@@ -105,89 +106,17 @@ msgid "Line {line}: The taxes specified in the invoice line ({tax_line}) and the
 msgstr "Position {line}: Die Steuern, die in der Rechnungsposition ({tax_line}) und dem entsprechenden Konto ({tax_account}) spezifiziert wurden, stimmen nicht überein!"
 
 
-
-
 #. module: ecoservice_financeinterface_datev
 #: selection:res.company,exportmethod:0
 msgid "brutto"
 msgstr "brutto"
 
 #. module: ecoservice_financeinterface_datev
-#: model:ir.model,name:ecoservice_financeinterface_datev.model_account_tax
-msgid "Tax"
-msgstr "Steuer"
-
-#. module: ecoservice_financeinterface_datev
-#: view:res.company:0
-msgid "Financeinterface"
-msgstr "Finanzinterface"
-
-#. module: ecoservice_financeinterface_datev
-#: field:account.tax,datev_skonto:0
-msgid "Datev Skontokonto"
-msgstr "Datev Skontokonto"
-
-#. module: ecoservice_financeinterface_datev
-#: model:ir.model,name:ecoservice_financeinterface_datev.model_ecofi
-msgid "Ecoservice Financial Interface"
-msgstr "Ecoservice Finanzinterface"
-
-#. module: ecoservice_financeinterface_datev
-#: code:addons/ecoservice_financeinterface_datev/ecofi.py:51
-#, python-format
-msgid "Migrate Move %s / %s"
-msgstr "Migration von Buchungssatz %s / %s"
-
-#. module: ecoservice_financeinterface_datev
-#: model:ir.model,name:ecoservice_financeinterface_datev.model_account_account
-msgid "Account"
-msgstr "Konto"
-
-#. module: ecoservice_financeinterface_datev
-#: field:account.move,ecofi_manual:0
-msgid "Set Counteraccounts manual"
-msgstr "Manuelle Gegenkonten."
-
-#. module: ecoservice_financeinterface_datev
-#: code:addons/ecoservice_financeinterface_datev/ecofi.py:98
-#, python-format
-msgid "Error: No sales tax identification number stored in the partner!\n"
-""
-msgstr "Fehler: Keine Umsatzssteueridentifikationsnummer im Partner konfiguriert!\n"
-""
-
-#. module: ecoservice_financeinterface_datev
-#: model:ir.model,name:ecoservice_financeinterface_datev.model_res_company
-msgid "Companies"
-msgstr "Unternehmen"
-
-#. module: ecoservice_financeinterface_datev
-#: code:addons/ecoservice_financeinterface_datev/ecofi.py:64
-#, python-format
-msgid "Move Migration Finished"
-msgstr "Migration abgeschlossen"
-
-#. module: ecoservice_financeinterface_datev
-#: field:res.company,exportmethod:0
-msgid "Exportmethod"
-msgstr "Exportmethode"
-
-#. module: ecoservice_financeinterface_datev
-#: field:account.tax,buchungsschluessel:0
-msgid "Posting key"
-msgstr "Buchungsschlüssel"
-
-#. module: ecoservice_financeinterface_datev
-#: model:ir.model,name:ecoservice_financeinterface_datev.model_account_move
-msgid "Account Entry"
-msgstr "Buchungssatz"
-
-#. module: ecoservice_financeinterface_datev
-#: model:ir.model,name:ecoservice_financeinterface_datev.model_account_payment_term
-msgid "Payment Term"
-msgstr "Zahlungsbedingung"
-
-#. module: ecoservice_financeinterface_datev
 #: selection:res.company,exportmethod:0
 msgid "netto"
 msgstr "netto"
+
+#. module: ecoservice_financeinterface_datev
+#: field:res.company,exportmethod:0
+msgid "Export method"
+msgstr "Exportmethode"
