@@ -45,14 +45,14 @@ class AccountInvoice(models.Model):
 
         for rec in self:
             if rec.is_datev_validation_active():
-                for no, line in enumerate(rec.invoice_line):
+                for line_no, line in enumerate(rec.invoice_line, start=1):
                     try:
-                        line.perform_datev_validation(throw_exception=throw_exception, line_no=no + 1)
+                        line.perform_datev_validation(throw_exception=throw_exception, line_no=line_no)
                     except exceptions.DatevWarning as dw:
                         is_validated = False
                         error_list.append(dw.message)
 
-        if throw_exception and not is_applicable:
+        if throw_exception and not is_validated:
             raise exceptions.DatevWarning('\n'.join(error_list))
 
         return is_validated
