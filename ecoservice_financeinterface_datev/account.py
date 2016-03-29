@@ -24,11 +24,11 @@
 ##############################################################################
 
 from openerp import models, fields as v8_fields, _
-from openerp.osv import fields, osv
+from openerp.osv import fields, orm
 from decimal import Decimal
 
 
-class account_account(osv.osv):
+class account_account(orm.Model):
     """Inherits the account.account class and adds attributes
     """
     _inherit = 'account.account'
@@ -65,7 +65,7 @@ class AccountPaymentTerm(models.Model):
     zahlsl = v8_fields.Integer('Payment key')
 
 
-class account_move(osv.osv):
+class account_move(orm.Model):
     """ Inherits the account.move class to add checking methods to the original post method
     """
     _inherit = 'account.move'
