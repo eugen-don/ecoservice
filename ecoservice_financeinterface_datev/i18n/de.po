@@ -25,7 +25,7 @@ msgstr "Datev UST-ID"
 #: help:account.account,ustuebergabe:0
 #: code:addons/ecoservice_financeinterface_datev/account.py:0
 msgid "Is required when transferring a sales tax identification number from the account partner (e.g. EU-Invoice)"
-msgstr "Wird benötigt, wenn eine Umsatzsteueridentifikationsnummer  (z.B. EU-Rechnung)"
+msgstr "Wird benötigt, wenn die Umsatzsteueridentifikationsnummer des Konten-Partners übermittelt wird (z.B. EU-Rechnung)"
 
 #. module: ecoservice_financeinterface_datev
 #: field:account.account,automatic:0
