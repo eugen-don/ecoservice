@@ -23,21 +23,19 @@
 #    Copyright (C) 2004-2010 Tiny SPRL (<http://tiny.be>).
 ##############################################################################
 
-from openerp import models, fields as v8_fields, _
-from openerp.osv import fields, orm
+from openerp import models, fields, _
 from decimal import Decimal
 
 
-class account_account(orm.Model):
+class account_account(models.Model):
     """Inherits the account.account class and adds attributes
     """
     _inherit = 'account.account'
-    _columns = {
-        'ustuebergabe': fields.boolean('Datev VAT-ID', help=_(u'Is required when transferring a sales tax identification number from the account partner (e.g. EU-Invoice)')),
-        'automatic': fields.boolean('Datev Automatic Account'),
-        'datev_steuer': fields.many2one('account.tax', 'Datev Tax Account'),
-        'datev_steuer_erforderlich': fields.boolean('Tax posting required?'),
-    }
+
+    ustuebergabe = fields.Boolean('Datev VAT-ID', help=_(u'Is required when transferring a sales tax identification number from the account partner (e.g. EU-Invoice)'))
+    automatic = fields.Boolean('Datev Automatic Account')
+    datev_steuer = fields.Many2one('account.tax', 'Datev Tax Account')
+    datev_steuer_erforderlich = fields.Boolean('Tax posting required?')
 
     def cron_update_line_autoaccounts_tax(self, cr, uid, context=None):
         """Method for Cronjop that Updates all account.move.lines
@@ -55,26 +53,22 @@ class AccountTax(models.Model):
     """Inherits the account.tax class and adds attributes
     """
     _inherit = 'account.tax'
-    datev_skonto = v8_fields.Many2one('account.account', 'Datev Cashback Account')
+    datev_skonto = fields.Many2one('account.account', 'Datev Cashback Account')
 
 
 class AccountPaymentTerm(models.Model):
     """Inherits the account.payment.term class and adds attributes
     """
     _inherit = 'account.payment.term'
-    zahlsl = v8_fields.Integer('Payment key')
+    zahlsl = fields.Integer('Payment key')
 
 
-class account_move(orm.Model):
+class account_move(models.Model):
     """ Inherits the account.move class to add checking methods to the original post method
     """
     _inherit = 'account.move'
-    _columns = {
-        'enable_datev_checks': fields.boolean('Perform Datev checks')
-    }
-    _defaults = {
-        'enable_datev_checks': True
-    }
+
+    enable_datev_checks = fields.Boolean('Perform Datev Checks', default=True)
 
     def datev_account_checks(self, cr, uid, move, context=None):
         context = context or dict()
@@ -184,7 +178,7 @@ class AccountMoveLine(models.Model):
     """
     _inherit = 'account.move.line'
 
-    ecofi_bu = v8_fields.Selection([
+    ecofi_bu = fields.Selection([
         ('40', '40'),
-        ('SD', 'Steuer Direkt'),
-    ], 'Datev BU', select=True),
+        ('SD', 'Steuer Direkt')
+    ], 'Datev BU', select=True)

@@ -56,10 +56,10 @@ msgstr "Datev Zahlungsschlüssel"
 
 
 #. module: ecoservice_financeinterface_datev
-#: field:account.move,enable_datev_checks
-#: field:account.invoice,enable_datev_checks
-#: field:res.company,enable_datev_checks
-msgid "Perform Datev checks"
+#: field:account.move,enable_datev_checks:0
+#: field:account.invoice,enable_datev_checks:0
+#: field:res.company,enable_datev_checks:0
+msgid "Perform Datev Checks"
 msgstr "Datev-Checks durchführen"
 
 

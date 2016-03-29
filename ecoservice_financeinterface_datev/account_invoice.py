@@ -31,7 +31,7 @@ from . import exceptions
 class AccountInvoice(models.Model):
     _inherit = 'account.invoice'
 
-    enable_datev_checks = fields.Boolean('Perform Datev checks', default=True)
+    enable_datev_checks = fields.Boolean('Perform Datev Checks', default=True)
 
     @api.multi
     def is_datev_validation_active(self):
