@@ -33,14 +33,10 @@ class account_account(osv.osv):
     """
     _inherit = "account.account"
     _columns = {
-        'ustuebergabe': fields.boolean('Datev UST-ID', help=_("""Is required when transferring
-                a sales tax identification number  from the account partner (e.g. EU-Invoice)""")),
+        'ustuebergabe': fields.boolean('Datev VAT-ID', help=_(u'Is required when transferring a sales tax identification number from the account partner (e.g. EU-Invoice)')),
         'automatic': fields.boolean('Datev Automatikkonto'),
         'datev_steuer': fields.many2one('account.tax', 'Datev Steuerkonto'),
         'datev_steuer_erforderlich': fields.boolean('Steuerbuchung erforderlich?'),
-    }
-    _defaults = {
-        'ustuebergabe': lambda *a: False,
     }
 
     def cron_update_line_autoaccounts_tax(self, cr, uid, context=None):
@@ -83,33 +79,33 @@ class account_move(osv.osv):
 
     def datev_account_checks(self, cr, uid, move, context=None):
         context = context or dict()
-        error = ''
+        errors = []
         self.update_line_autoaccounts_tax(cr, uid, move, context=context)
         for linecount, line in enumerate(move.line_id, start=1):
             if line.account_id.id != line.ecofi_account_counterpart.id:
                 if not self.pool.get('ecofi').is_taxline(cr, line.account_id.id) or line.ecofi_bu == 'SD':
                     linetax = self.pool.get('ecofi').get_line_tax(cr, uid, line)
                     if line.account_id.automatic and not line.account_id.datev_steuer:
-                        error += _(u"""The account %s is an Autoaccount, although the automatic taxes are not configured!\n""") % (line.account_id.code)
+                        errors.append(_(u'The account {account} is an Autoaccount, although the automatic taxes are not configured!'.format(account=line.account_id.code)))
                     if line.account_id.datev_steuer_erforderlich and not linetax:
-                        error += _(u"""The Account requires a tax, although the moveline %s has no tax!\n""") % (linecount)
+                        errors.append(_(u'The Account requires a tax, although the moveline {line} has no tax!'.format(line=linecount)))
                     if line.account_id.automatic and linetax:
                         if not line.account_id.datev_steuer or linetax.id != line.account_id.datev_steuer.id:
-                            error += _(u"""The account is an Autoaccount, altough the taxaccount (%s) in the moveline %s is an other than the configured %s!\n""") % (linecount,
-                                                                                                                                                                          linetax.name,
-                                                                                                                                                                          line.account_id.datev_steuer.name)
+                            errors.append(_(
+                                u'The account is an Autoaccount, but the tax account ({line}) in the move line {tax_line} differs from the configured {tax_datev}!'.format(
+                                    line=linecount,
+                                    tax_line=linetax.name,
+                                    tax_datev=line.account_id.datev_steuer.name)))
                     if line.account_id.automatic and not linetax:
-                        error += _(u"""The account is an Autoaccount, altough the taxaccount in the moveline %s is not set!\n""") % (linecount)
-                    if not line.account_id.automatic and linetax and linetax.buchungsschluessel < 0:  # pylint: disable-msg=E1103
-                        error += _(u"""The bookingkey for the tax %s is not configured!\n""") % (linetax.name)  # pylint: disable-msg=E1103,C0301
-        return error
+                        errors.append(_(u'The account is an Auto-Account, but the tax account in the move line {line} is not set!'.format(line=linecount)))
+                    if not line.account_id.automatic and linetax and linetax.buchungsschluessel < 0:
+                        errors.append(_(u'The booking key for the tax {tax} is not configured!'.format(tax=linetax.name)))
+        return '\n'.join(errors)
 
     def update_line_autoaccounts_tax(self, cr, uid, move, context=None):
         context = context or dict()
-        error = ''
-        linecount = 0
-        for line in move.line_id:
-            linecount += 1
+        errors = []
+        for linecount, line in enumerate(move.line_id, start=1):
             if line.account_id.id != line.ecofi_account_counterpart.id:
                 if not self.pool.get('ecofi').is_taxline(cr, line.account_id.id):
                     linetax = self.pool.get('ecofi').get_line_tax(cr, uid, line)
@@ -117,8 +113,8 @@ class account_move(osv.osv):
                         if line.account_id.datev_steuer:
                             self.pool.get('account.move.line').write(cr, uid, [line.id], {'ecofi_taxid': line.account_id.datev_steuer.id}, context=context)
                         else:
-                            error += _(u"""The Account is an Autoaccount, although the moveline %s has no tax!\n""") % (linecount)
-        return error
+                            errors.append(_(u'The Account is an Auto-Account, but the move line {line} has no tax!'.format(line=linecount)))
+        return '\n'.join(errors)
 
     def datev_tax_check(self, cr, uid, move, context=None):
         context = context or dict()

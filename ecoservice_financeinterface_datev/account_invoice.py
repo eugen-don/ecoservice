@@ -80,8 +80,8 @@ class AccountInvoiceLine(models.Model):
         is_applicable = len(self.invoice_line_tax_id) == 1 and self.account_id.datev_steuer == self.invoice_line_tax_id
         if throw_exception and not is_applicable:
             raise exceptions.DatevWarning(
-                _(u'Line {line_no}: The taxes specified in the invoice line ({tax_line}) and the corresponding account ({tax_account}) mismatch.'.format(
-                    line_no=line_no, tax_line=self.invoice_line_tax_id.description, tax_account=self.account_id.datev_steuer.description
+                _(u'Line {line}: The taxes specified in the invoice line ({tax_line}) and the corresponding account ({tax_account}) mismatch.'.format(
+                    line=line_no, tax_line=self.invoice_line_tax_id.description, tax_account=self.account_id.datev_steuer.description
                 ))
             )
         return is_applicable
