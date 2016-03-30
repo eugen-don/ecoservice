@@ -35,7 +35,7 @@ class account_account(models.Model):
 
     ustuebergabe = fields.Boolean('Datev VAT-ID', help=_(u'Is required when transferring a sales tax identification number from the account partner (e.g. EU-Invoice)'))
     automatic = fields.Boolean('Datev Automatic Account')
-    datev_steuer = fields.Many2one('account.tax', 'Datev Tax Account')
+    datev_steuer = fields.Many2one('account.tax', 'Datev Tax Account', domain=[('buchungsschluessel', '!=', -1)])
     datev_steuer_erforderlich = fields.Boolean('Tax posting required?')
 
     def cron_update_line_autoaccounts_tax(self, cr, uid, context=None):
