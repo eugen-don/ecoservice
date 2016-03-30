@@ -41,22 +41,24 @@ class AccountInvoice(models.Model):
     @api.multi
     def perform_datev_validation(self, silent=False):
         is_valid = True
-        error_list = []
+        errors = list()
 
         for rec in self:
             if rec.is_datev_validation_active():
-                if silent:  # Kürze Version ohne String- und Exception-Handling
-                    is_valid = reduce(lambda a, b: a & b, [line.perform_datev_validation(silent=True) for line in rec.invoice_line])
+                if silent:  # Kürze, performantere Version ohne String- und Exception-Handling
+                    for line in rec.invoice_line:
+                        if not line.perform_datev_validation(silent=True):
+                            return False
                 else:
                     for line_no, line in enumerate(rec.invoice_line, start=1):
                         try:
                             line.perform_datev_validation(line_no=line_no)
                         except exceptions.DatevWarning as dw:
                             is_valid = False
-                            error_list.append(dw.message)
+                            errors.append(dw.message)
 
         if not silent and not is_valid:
-            raise exceptions.DatevWarning('\n'.join(error_list))
+            raise exceptions.DatevWarning('\n'.join(errors))
 
         return is_valid
 

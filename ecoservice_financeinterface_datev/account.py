@@ -73,7 +73,7 @@ class account_move(models.Model):
 
     def datev_account_checks(self, cr, uid, move, context=None):
         context = context or dict()
-        errors = []
+        errors = list()
         self.update_line_autoaccounts_tax(cr, uid, move, context=context)
         for linecount, line in enumerate(move.line_id, start=1):
             if line.account_id.id != line.ecofi_account_counterpart.id:
@@ -97,7 +97,7 @@ class account_move(models.Model):
 
     def update_line_autoaccounts_tax(self, cr, uid, move, context=None):
         context = context or dict()
-        errors = []
+        errors = list()
         for linecount, line in enumerate(move.line_id, start=1):
             if line.account_id.id != line.ecofi_account_counterpart.id:
                 if not self.pool.get('ecofi').is_taxline(cr, line.account_id.id):
@@ -111,9 +111,9 @@ class account_move(models.Model):
 
     def datev_tax_check(self, cr, uid, move, context=None):
         context = context or dict()
-        errors = []
+        errors = list()
         linecount = 0
-        tax_values = {}
+        tax_values = dict()
         linecounter = 0
         for line in move.line_id:
             linecount += 1
@@ -156,12 +156,12 @@ class account_move(models.Model):
         :param context: context arguments, like lang, time zone
         """
         context = context or dict()
-        error = ''
-        error += self.update_line_autoaccounts_tax(cr, uid, move, context=context)
-        error += self.datev_account_checks(cr, uid, move, context=context)
-        if error == '':
-            error += self.datev_tax_check(cr, uid, move, context=context)
-        return error or False
+        errors = list()
+        errors.append(self.update_line_autoaccounts_tax(cr, uid, move, context=context))
+        errors.append(self.datev_account_checks(cr, uid, move, context=context))
+        if not errors:
+            errors.append(self.datev_tax_check(cr, uid, move, context=context))
+        return '\n'.join(errors) or False
 
     def finance_interface_checks(self, cr, uid, ids, context=None):
         context = context or dict()
