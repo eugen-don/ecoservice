@@ -39,37 +39,40 @@ class AccountInvoice(models.Model):
         return self.enable_datev_checks and self.env['res.users'].browse(self._uid).company_id.enable_datev_checks
 
     @api.multi
-    def perform_datev_validation(self, throw_exception=False):
-        is_validated = True
+    def perform_datev_validation(self, silent=False):
+        is_valid = True
         error_list = []
 
         for rec in self:
             if rec.is_datev_validation_active():
-                for line_no, line in enumerate(rec.invoice_line, start=1):
-                    try:
-                        line.perform_datev_validation(throw_exception=throw_exception, line_no=line_no)
-                    except exceptions.DatevWarning as dw:
-                        is_validated = False
-                        error_list.append(dw.message)
+                if silent:  # Kürze Version ohne String- und Exception-Handling
+                    is_valid = reduce(lambda a, b: a & b, [line.perform_datev_validation(silent=True) for line in rec.invoice_line])
+                else:
+                    for line_no, line in enumerate(rec.invoice_line, start=1):
+                        try:
+                            line.perform_datev_validation(line_no=line_no)
+                        except exceptions.DatevWarning as dw:
+                            is_valid = False
+                            error_list.append(dw.message)
 
-        if throw_exception and not is_validated:
+        if not silent and not is_valid:
             raise exceptions.DatevWarning('\n'.join(error_list))
 
-        return is_validated
+        return is_valid
 
 
 class AccountInvoiceLine(models.Model):
     _inherit = 'account.invoice.line'
 
     @api.multi
-    def perform_datev_validation(self, throw_exception=False, line_no=None):
+    def perform_datev_validation(self, silent=False, line_no=None):
         """
         Performs tests on an invoice line for whether the taxes are correctly set or not.
 
         The major use of this method is in the condition of a workflow transition.
 
         :param line_no: int Line number to be displayed in an error message.
-        :param throw_exception: bool Specifies whether an exception in case of a failed test should be thrown
+        :param silent: bool Specifies whether an exception in case of a failed test should be thrown
             or if the checks should be performed silently.
         :return: True if all checks were performed w/o errors or no datev checks are applicable. False otherwise.
         :rtype: bool
@@ -77,14 +80,14 @@ class AccountInvoiceLine(models.Model):
         self.ensure_one()
         if not self.perform_datev_validation_applicability_check():
             return True
-        is_applicable = len(self.invoice_line_tax_id) == 1 and self.account_id.datev_steuer == self.invoice_line_tax_id
-        if throw_exception and not is_applicable:
+        is_valid = len(self.invoice_line_tax_id) == 1 and self.account_id.datev_steuer == self.invoice_line_tax_id
+        if not silent and not is_valid:
             raise exceptions.DatevWarning(
-                _(u'Line {line}: The taxes specified in the invoice line ({tax_line}) and the corresponding account ({tax_account}) mismatch!'.format(
+                _(u'Line {line}: The taxes specified in the invoice line ({tax_line}) and the corresponding account ({tax_account}) mismatch!').format(
                     line=line_no, tax_line=self.invoice_line_tax_id.description, tax_account=self.account_id.datev_steuer.description
-                ))
+                )
             )
-        return is_applicable
+        return is_valid
 
     @api.multi
     def perform_datev_validation_applicability_check(self):

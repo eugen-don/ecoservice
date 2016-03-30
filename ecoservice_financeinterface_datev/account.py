@@ -25,6 +25,7 @@
 
 from openerp import models, fields, _
 from decimal import Decimal
+from . import exceptions
 
 
 class account_account(models.Model):
@@ -79,19 +80,19 @@ class account_move(models.Model):
                 if not self.pool.get('ecofi').is_taxline(cr, line.account_id.id) or line.ecofi_bu == 'SD':
                     linetax = self.pool.get('ecofi').get_line_tax(cr, uid, line)
                     if line.account_id.automatic and not line.account_id.datev_steuer:
-                        errors.append(_(u'The account {account} is an Auto-Account, but the automatic taxes are not configured!'.format(
-                            account=line.account_id.code)))
+                        errors.append(_(u'The account {account} is an Auto-Account but the automatic taxes are not configured!').format(
+                            account=line.account_id.code))
                     if line.account_id.datev_steuer_erforderlich and not linetax:
-                        errors.append(_(u'The Account requires a tax but the move line {line} has no tax!'.format(line=linecount)))
+                        errors.append(_(u'The Account requires a tax but the move line {line} has no tax!').format(line=linecount))
                     if line.account_id.automatic and linetax:
                         if not line.account_id.datev_steuer or linetax.id != line.account_id.datev_steuer.id:
                             errors.append(_(
-                                u'The account is an Auto-Account but the tax account ({line}) in the move line {tax_line} differs from the configured {tax_datev}!'.format(
-                                    line=linecount, tax_line=linetax.name, tax_datev=line.account_id.datev_steuer.name)))
+                                u'The account is an Auto-Account but the tax account ({line}) in the move line {tax_line} differs from the configured {tax_datev}!').format(
+                                    line=linecount, tax_line=linetax.name, tax_datev=line.account_id.datev_steuer.name))
                     if line.account_id.automatic and not linetax:
-                        errors.append(_(u'The account is an Auto-Account but the tax account in the move line {line} is not set!'.format(line=linecount)))
+                        errors.append(_(u'The account is an Auto-Account but the tax account in the move line {line} is not set!').format(line=linecount))
                     if not line.account_id.automatic and linetax and linetax.buchungsschluessel < 0:
-                        errors.append(_(u'The booking key for the tax {tax} is not configured!'.format(tax=linetax.name)))
+                        errors.append(_(u'The booking key for the tax {tax} is not configured!').format(tax=linetax.name))
         return '\n'.join(errors)
 
     def update_line_autoaccounts_tax(self, cr, uid, move, context=None):
@@ -105,7 +106,7 @@ class account_move(models.Model):
                         if line.account_id.datev_steuer:
                             self.pool.get('account.move.line').write(cr, uid, [line.id], {'ecofi_taxid': line.account_id.datev_steuer.id}, context=context)
                         else:
-                            errors.append(_(u'The Account is an Auto-Account but the move line {line} has no tax!'.format(line=linecount)))
+                            errors.append(_(u'The Account is an Auto-Account but the move line {line} has no tax!').format(line=linecount))
         return '\n'.join(errors)
 
     def datev_tax_check(self, cr, uid, move, context=None):
@@ -119,9 +120,10 @@ class account_move(models.Model):
             if line.account_id.id != line.ecofi_account_counterpart.id:
                 if self.pool.get('ecofi').is_taxline(cr, line.account_id.id) and not line.ecofi_bu == 'SD':
                     if line.account_id.code not in tax_values:
-                        tax_values[line.account_id.code] = {'real': 0.00,
-                                                            'datev': 0.00,
-                                                            }
+                        tax_values[line.account_id.code] = {
+                            'real': 0.0,
+                            'datev': 0.0
+                        }
                     tax_values[line.account_id.code]['real'] += line.debit - line.credit
                 else:
                     linecounter += 1
@@ -133,16 +135,17 @@ class account_move(models.Model):
                         if taxaccount:
                             datev_account_code = self.pool.get('account.account').read(cr, uid, taxaccount, context=new_context)['code']
                             if datev_account_code not in tax_values:
-                                tax_values[datev_account_code] = {'real': 0.00,
-                                                                  'datev': 0.00,
-                                                                  }
+                                tax_values[datev_account_code] = {
+                                    'real': 0.0,
+                                    'datev': 0.0,
+                                }
                             if line.ecofi_bu and line.ecofi_bu == '40':
                                 continue
                             tax_values[datev_account_code]['datev'] += taxcalc_id['amount']
         for tax in tax_values:
             if Decimal(str(abs(tax_values[tax]['real'] - tax_values[tax]['datev']))) > Decimal(str(10 ** -2 * linecounter)):
-                errors.append(_(u'The value for the booked {real} and the calculated tax {datev} differs for the tax account {tax}!'.format(
-                    tax=tax, real=tax_values[tax]['real'], datev=tax_values[tax]['datev'])))
+                errors.append(_(u'The value for the booked tax {real} and the calculated tax {datev} differ for the tax account {tax}!').format(
+                    tax=tax, real=tax_values[tax]['real'], datev=tax_values[tax]['datev']))
         return '\n'.join(errors)
 
     def datev_checks(self, cr, uid, move, context=None):
@@ -169,7 +172,7 @@ class account_move(models.Model):
                     res &= super(account_move, self).finance_interface_checks(cr, uid, ids, context=context)
                     error = self.datev_checks(cr, uid, move, context=context)
                     if error:
-                        raise osv.except_osv('Error', error)
+                        raise exceptions.DatevWarning(error)
         return res
 
 
