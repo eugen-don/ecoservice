@@ -1,0 +1,188 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+#	* ecoservice_text_template
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 9.0e\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2016-02-09 14:44+0000\n"
+"PO-Revision-Date: 2016-02-09 14:44+0000\n"
+"Last-Translator: <>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: ecoservice_text_template
+#: model:ir.ui.view,arch_db:ecoservice_text_template.account_invoice_text_template_configuration
+#: model:ir.ui.view,arch_db:ecoservice_text_template.purchase_text_template_configuration
+#: model:ir.ui.view,arch_db:ecoservice_text_template.sale_text_template_configuration
+msgid "Cancel"
+msgstr "Abbrechen"
+
+#. module: ecoservice_text_template
+#: model:ir.actions.act_window,name:ecoservice_text_template.invoice_text_settings_action
+#: model:ir.actions.act_window,name:ecoservice_text_template.purchase_text_settings_action
+#: model:ir.actions.act_window,name:ecoservice_text_template.sale_text_settings_action
+msgid "Configure Text Templates"
+msgstr "Konfiguration der Textvorlagen"
+
+#. module: ecoservice_text_template
+#: model:ir.model.fields,field_description:ecoservice_text_template.field_account_invoice_text_config_settings_create_uid
+#: model:ir.model.fields,field_description:ecoservice_text_template.field_purchase_text_config_settings_create_uid
+#: model:ir.model.fields,field_description:ecoservice_text_template.field_sale_text_config_settings_create_uid
+msgid "Created by"
+msgstr "Angelegt von"
+
+#. module: ecoservice_text_template
+#: model:ir.model.fields,field_description:ecoservice_text_template.field_account_invoice_text_config_settings_create_date
+#: model:ir.model.fields,field_description:ecoservice_text_template.field_purchase_text_config_settings_create_date
+#: model:ir.model.fields,field_description:ecoservice_text_template.field_sale_text_config_settings_create_date
+msgid "Created on"
+msgstr "Angelegt am"
+
+#. module: ecoservice_text_template
+#: model:ir.model.fields,field_description:ecoservice_text_template.field_account_invoice_text_config_settings_display_name
+#: model:ir.model.fields,field_description:ecoservice_text_template.field_purchase_text_config_settings_display_name
+#: model:ir.model.fields,field_description:ecoservice_text_template.field_sale_text_config_settings_display_name
+msgid "Display Name"
+msgstr "Anzeigename"
+
+#. module: ecoservice_text_template
+#: model:ir.model.fields,field_description:ecoservice_text_template.field_account_invoice_text_config_settings_id
+#: model:ir.model.fields,field_description:ecoservice_text_template.field_purchase_text_config_settings_id
+#: model:ir.model.fields,field_description:ecoservice_text_template.field_sale_text_config_settings_id
+msgid "ID"
+msgstr "ID"
+
+#. module: ecoservice_text_template
+#: model:ir.model,name:ecoservice_text_template.model_account_invoice
+msgid "Invoice"
+msgstr "Rechnung"
+
+#. module: ecoservice_text_template
+#: model:ir.model.fields,field_description:ecoservice_text_template.field_account_invoice_invoice_text
+#: model:ir.model.fields,field_description:ecoservice_text_template.field_account_invoice_text_config_settings_default_invoice_text
+msgid "Invoice Text"
+msgstr "Rechnungstext"
+
+#. module: ecoservice_text_template
+#: model:ir.ui.view,arch_db:ecoservice_text_template.account_invoice_text_template_configuration
+msgid "Invoices"
+msgstr "Alle Rechnungen"
+
+#. module: ecoservice_text_template
+#: model:ir.model.fields,field_description:ecoservice_text_template.field_account_invoice_text_config_settings___last_update
+#: model:ir.model.fields,field_description:ecoservice_text_template.field_purchase_text_config_settings___last_update
+#: model:ir.model.fields,field_description:ecoservice_text_template.field_sale_text_config_settings___last_update
+msgid "Last Modified on"
+msgstr "Zuletzt geändert am"
+
+#. module: ecoservice_text_template
+#: model:ir.model.fields,field_description:ecoservice_text_template.field_account_invoice_text_config_settings_write_uid
+#: model:ir.model.fields,field_description:ecoservice_text_template.field_purchase_text_config_settings_write_uid
+#: model:ir.model.fields,field_description:ecoservice_text_template.field_sale_text_config_settings_write_uid
+msgid "Last Updated by"
+msgstr "Zuletzt aktualisiert durch"
+
+#. module: ecoservice_text_template
+#: model:ir.model.fields,field_description:ecoservice_text_template.field_account_invoice_text_config_settings_write_date
+#: model:ir.model.fields,field_description:ecoservice_text_template.field_purchase_text_config_settings_write_date
+#: model:ir.model.fields,field_description:ecoservice_text_template.field_sale_text_config_settings_write_date
+msgid "Last Updated on"
+msgstr "Zuletzt aktualisiert am"
+
+#. module: ecoservice_text_template
+#: model:ir.model.fields,field_description:ecoservice_text_template.field_purchase_order_purchase_confirmation
+#: model:ir.model.fields,field_description:ecoservice_text_template.field_purchase_text_config_settings_default_purchase_confirmation
+msgid "Purchase Confirmation Text"
+msgstr "Auftragsbestätigungstext"
+
+#. module: ecoservice_text_template
+#: model:ir.model.fields,field_description:ecoservice_text_template.field_purchase_order_purchase_offer
+#: model:ir.model.fields,field_description:ecoservice_text_template.field_purchase_text_config_settings_default_purchase_offer
+msgid "Purchase Offer Text"
+msgstr "Angebotstext"
+
+#. module: ecoservice_text_template
+#: model:ir.model,name:ecoservice_text_template.model_purchase_order
+msgid "Purchase Order"
+msgstr "Beschaffungsauftrag"
+
+#. module: ecoservice_text_template
+#: model:ir.ui.view,arch_db:ecoservice_text_template.purchase_text_template_configuration
+msgid "Purchases"
+msgstr "Einkauf"
+
+#. module: ecoservice_text_template
+#: model:ir.model.fields,field_description:ecoservice_text_template.field_sale_order_sale_confirmation
+#: model:ir.model.fields,field_description:ecoservice_text_template.field_sale_text_config_settings_default_sale_confirmation
+msgid "Sale Confirmation Text"
+msgstr "Auftragsbestätigungstext"
+
+#. module: ecoservice_text_template
+#: model:ir.model.fields,field_description:ecoservice_text_template.field_sale_order_sale_offer
+#: model:ir.model.fields,field_description:ecoservice_text_template.field_sale_text_config_settings_default_sale_offer
+msgid "Sale Offer Text"
+msgstr "Angebotstext"
+
+#. module: ecoservice_text_template
+#: model:ir.model.fields,field_description:ecoservice_text_template.field_sale_order_sale_receipt
+#: model:ir.model.fields,field_description:ecoservice_text_template.field_sale_text_config_settings_default_sale_receipt
+msgid "Sale Receipt Text"
+msgstr "Individuelles Angebot"
+
+#. module: ecoservice_text_template
+#: model:ir.ui.view,arch_db:ecoservice_text_template.sale_text_template_configuration
+msgid "Sales"
+msgstr "Verkauf"
+
+#. module: ecoservice_text_template
+#: model:ir.model,name:ecoservice_text_template.model_sale_order
+msgid "Sales Order"
+msgstr "Verkaufsauftrag"
+
+#. module: ecoservice_text_template
+#: model:ir.ui.view,arch_db:ecoservice_text_template.account_invoice_text_template_configuration
+#: model:ir.ui.view,arch_db:ecoservice_text_template.purchase_text_template_configuration
+#: model:ir.ui.view,arch_db:ecoservice_text_template.sale_text_template_configuration
+msgid "Save"
+msgstr "Speichern"
+
+#. module: ecoservice_text_template
+#: model:ir.ui.menu,name:ecoservice_text_template.invoice_text_settings_menu
+#: model:ir.ui.menu,name:ecoservice_text_template.purchase_text_settings_menu
+#: model:ir.ui.menu,name:ecoservice_text_template.sale_text_settings_menu
+#: model:ir.ui.view,arch_db:ecoservice_text_template.account_invoice_form_inherit_texttemplate
+#: model:ir.ui.view,arch_db:ecoservice_text_template.account_invoice_text_template_configuration
+#: model:ir.ui.view,arch_db:ecoservice_text_template.purchase_order_form_inherit_texttemplate
+#: model:ir.ui.view,arch_db:ecoservice_text_template.purchase_text_template_configuration
+#: model:ir.ui.view,arch_db:ecoservice_text_template.sale_text_template_configuration
+#: model:ir.ui.view,arch_db:ecoservice_text_template.view_order_form_inherit_texttemplate
+msgid "Text Templates"
+msgstr "Textvorlagen"
+
+#. module: ecoservice_text_template
+#: model:ir.model,name:ecoservice_text_template.model_account_invoice_text_config_settings
+msgid "account.invoice.text.config.settings"
+msgstr "account.invoice.text.config.settings"
+
+#. module: ecoservice_text_template
+#: model:ir.ui.view,arch_db:ecoservice_text_template.account_invoice_text_template_configuration
+#: model:ir.ui.view,arch_db:ecoservice_text_template.purchase_text_template_configuration
+#: model:ir.ui.view,arch_db:ecoservice_text_template.sale_text_template_configuration
+msgid "or"
+msgstr "oder"
+
+#. module: ecoservice_text_template
+#: model:ir.model,name:ecoservice_text_template.model_purchase_text_config_settings
+msgid "purchase.text.config.settings"
+msgstr "purchase.text.config.settings"
+
+#. module: ecoservice_text_template
+#: model:ir.model,name:ecoservice_text_template.model_sale_text_config_settings
+msgid "sale.text.config.settings"
+msgstr "sale.text.config.settings"
+

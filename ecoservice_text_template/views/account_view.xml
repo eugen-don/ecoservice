@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+##############################################################################
+#    ecoservice_text_template
+#    Copyright (c) 2015 ecoservice GbR (<http://www.ecoservice.de>).
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU Affero General Public License as
+#    published by the Free Software Foundation, either version 3 of the
+#    License, or (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU Affero General Public License for more details.
+#
+#    You should have received a copy of the GNU Affero General Public License
+#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+#    This program based on OpenERP.
+#    OpenERP, Open Source Management Solution
+#    Copyright (C) 2004-2010 Tiny SPRL (<http://tiny.be>).
+##############################################################################
+-->
+<openerp>
+  <data>
+
+    <record id="account_invoice_form_inherit_texttemplate" model="ir.ui.view">
+      <field name="name">account.invoice.order.form.inherit.texttemplate</field>
+      <field name="model">account.invoice</field>
+      <field name="inherit_id" ref="account.invoice_form" />
+      <field name="arch" type="xml">
+        <xpath expr="//notebook" position="inside">
+          <page name="texttemplates" string="Text Templates">
+            <group>
+              <field name="invoice_text" widget="html" />
+            </group>
+          </page>
+        </xpath>
+      </field>
+    </record>
+
+    <record id="account_invoice_text_template_configuration" model="ir.ui.view">
+      <field name="name">Invoice Text Templates</field>
+      <field name="model">account.invoice.text.config.settings</field>
+      <field name="arch" type="xml">
+        <form string="Text Templates" class="oe_form_configuration">
+          <header>
+            <button string="Save"
+                    type="object"
+                    name="execute"
+                    class="oe_highlight" />
+            or
+            <button string="Cancel"
+                    type="object"
+                    name="cancel"
+                    class="oe_link" />
+          </header>
+          <sheet>
+            <group string="Invoices">
+              <field name="default_invoice_text" />
+            </group>
+          </sheet>
+        </form>
+      </field>
+    </record>
+
+    <act_window id="invoice_text_settings_action"
+                name="Configure Text Templates"
+                res_model="account.invoice.text.config.settings"
+                view_id="account_invoice_text_template_configuration"
+                view_mode="form"
+                target="inline" />
+
+    <menuitem id="invoice_text_settings_menu"
+              name="Text Templates"
+              parent="account.menu_finance_configuration"
+              action="invoice_text_settings_action"
+              sequence="1" />
+  </data>
+</openerp>
