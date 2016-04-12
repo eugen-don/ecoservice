@@ -161,7 +161,7 @@ class account_move(models.Model):
         errors.append(self.datev_account_checks(cr, uid, move, context=context))
         if not errors:
             errors.append(self.datev_tax_check(cr, uid, move, context=context))
-        return '\n'.join(errors) or False
+        return '\n'.join(filter(lambda e: bool(e), errors)) or False
 
     def finance_interface_checks(self, cr, uid, ids, context=None):
         context = context or dict()

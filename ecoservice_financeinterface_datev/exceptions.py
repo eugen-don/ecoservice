@@ -20,7 +20,7 @@
 #    OpenERP, Open Source Management Solution
 #    Copyright (C) 2004-2010 Tiny SPRL (<http://tiny.be>).
 
-from ecoservice_financeinterface.exceptions import FinanceinterfaceException
+from openerp.addons.ecoservice_financeinterface.exceptions import FinanceinterfaceException
 
 
 class DatevWarning(FinanceinterfaceException):
