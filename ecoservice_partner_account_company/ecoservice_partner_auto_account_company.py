@@ -22,6 +22,7 @@
 ##############################################################################
 from openerp.osv import fields, osv
 from openerp.tools.translate import _
+from openerp import models
 
 
 class ecoservice_partner_auto_account_company(osv.osv):
@@ -147,3 +148,13 @@ class eco_partner(osv.osv):
             self.pool.get('ecoservice.partner.auto.account.company').get_accounts(cr, uid, partner, context=context)
         return True
 eco_partner()
+
+
+class AccountAccount(models.Model):
+    _inherit = "account.account"
+    _sql_constraints = [
+        ('code_company_user_type_uniq', 'unique (code,company_id,user_type_id)', 'The code and the user_type of the '
+                                                                                 'account must be unique per company '
+                                                                                 '!'),
+        ('code_company_uniq', 'Check(1=1)', 'The code of the account must be unique per company !')
+    ]
