@@ -142,10 +142,16 @@ class account_move(models.Model):
                             if line.ecofi_bu and line.ecofi_bu == '40':
                                 continue
                             tax_values[datev_account_code]['datev'] += taxcalc_id['amount']
-        for tax in tax_values:
-            if Decimal(str(abs(tax_values[tax]['real'] - tax_values[tax]['datev']))) > Decimal(str(10 ** -2 * linecounter)):
-                errors.append(_(u'The value for the booked tax {real} and the calculated tax {datev} differ for the tax account {tax}!').format(
-                    tax=tax, real=tax_values[tax]['real'], datev=tax_values[tax]['datev']))
+
+        sum_real = 0.0
+        sum_datev = 0.0
+        for value in tax_values.itervalues():
+            sum_real += value['real']
+            sum_datev += value['datev']
+        if Decimal(str(abs(sum_real - sum_datev))) > Decimal(str(10 ** -2 * linecounter)):
+            errors.append(_(u'The sums for booked ({real}) and calculated ({datev}) are different!').format(
+                real=sum_real, datev=sum_datev))
+
         return '\n'.join(errors)
 
     def datev_checks(self, cr, uid, move, context=None):

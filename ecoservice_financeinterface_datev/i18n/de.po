@@ -96,8 +96,8 @@ msgstr "Das Konto ist ein Automatikkonto, allerdings ist in Buchungszeile {line}
 
 #. module: ecoservice_financeinterface_datev
 #: code:addons/ecoservice_financeinterface_datev/account.py:0
-msgid "The value for the booked tax {real} and the calculated tax {datev} differ for the tax account {tax}!"
-msgstr "Die Werte der gebuchten {real} und der berechneten Steuer {datev} unterscheiden sich für das Steuerkonto {tax}!"
+msgid "The sums for booked ({real}) and calculated ({datev}) are different!"
+msgstr "Die Summen der gebuchten ({real}) und der berechneten ({datev}) Steuer unterscheiden sich!"
 
 
 #. module: ecoservice_financeinterface_datev
