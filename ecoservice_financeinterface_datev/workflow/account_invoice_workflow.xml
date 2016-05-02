@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--  
-##############################################################################
-#    ecoservice_financeinterface
-#    Copyright (c) 2013 ecoservice GbR (<http://www.ecoservice.de>).
+<!--
+#    ecoservice_
+#    Copyright (c) 2015 ecoservice GbR (<http://www.ecoservice.de>).
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU Affero General Public License as
@@ -20,25 +19,16 @@
 #    This program based on OpenERP.
 #    OpenERP, Open Source Management Solution
 #    Copyright (C) 2004-2010 Tiny SPRL (<http://tiny.be>).
-##############################################################################
 -->
+
 <openerp>
   <data>
 
-    <record model="ir.ui.view" id="view_company_form_inherit_financeinterface">
-      <field name="name">res.company.form.inherit.financeinterface</field>
-      <field name="model">res.company</field>
-      <field name="inherit_id" ref="base.view_company_form"/>
-      <field name="arch" type="xml">
-        <page string="Configuration" position="after">
-          <page string="Financeinterface">
-            <group>
-              <field name="finance_interface"/>
-              <field name="journal_ids"/>
-            </group>
-          </page>
-        </page>
-      </field>
+    <record id="account.t4" model="workflow.transition">
+      <field name="act_from" ref="account.act_draft"/>
+      <field name="act_to" ref="account.act_open"/>
+      <field name="signal">invoice_open</field>
+      <field name="condition">perform_datev_validation()</field>
     </record>
 
   </data>

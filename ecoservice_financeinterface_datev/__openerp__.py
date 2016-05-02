@@ -20,12 +20,12 @@
 #    OpenERP, Open Source Management Solution
 #    Copyright (C) 2004-2010 Tiny SPRL (<http://tiny.be>).
 ##############################################################################
-{# pylint: disable-msg=W0104
-    "name" : "Ecoservice Financial Interface Datev",
-    "version" : "1.0",
-    "depends" : ["ecoservice_financeinterface", "mail"],
-    "author" : "ecoservice",
-    "website" : "www.ecoservice.de",
+{  # pylint: disable-msg=W0104
+    "name": "Ecoservice Financial Interface Datev",
+    "version": "1.1",
+    "depends": ["ecoservice_financeinterface", "mail"],
+    "author": "ecoservice",
+    "website": "www.ecoservice.de",
     "description": """The module ecoservice_financeinterface_datev provides methods to convert account moves to the Datevformat (Datev Dok.-Nr.: 1036228).
 
 Details of the module:
@@ -36,16 +36,17 @@ Further information under
 * Launchpad https://launchpad.net/ecoservice-openerp-addons
 * Ecoservice Website http://www.ecoservice.de
 """,
-    "category" : "Accounting",
-    "init_xml" : [],
-    "update_xml" : [
-                    'account_view.xml',
-                    'account_cron.xml',
-                    'res_company_view.xml',
-                    'ecoservice_financeinterface_datev_installer_view.xml'
-                    ],
-    "demo_xml" : [],
-    'test': [],
+    "category": "Accounting",
+    "update_xml": [
+        'account_view.xml',
+        'account_invoice_view.xml',
+        'account_cron.xml',
+        'res_company_view.xml',
+        'ecoservice_financeinterface_datev_installer_view.xml',
+        'workflow/account_invoice_workflow.xml'
+    ],
+    "demo": [],
+    "application": False,
     "active": False,
     "installable": True
 }

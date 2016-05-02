@@ -1,7 +1,7 @@
-# -*- encoding: utf-8 -*- # pylint: disable-msg=C0111
-##############################################################################
+# -*- coding: utf-8 -*-
+# pylint: disable-msg=C0111
 #    ecoservice_financeinterface_datev
-#    Copyright (c) 2013 ecoservice GbR (<http://www.ecoservice.de>).
+#    Copyright (c) 2015 ecoservice GbR (<http://www.ecoservice.de>).
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU Affero General Public License as
@@ -19,9 +19,9 @@
 #    This program based on OpenERP.
 #    OpenERP, Open Source Management Solution
 #    Copyright (C) 2004-2010 Tiny SPRL (<http://tiny.be>).
-##############################################################################
-import account
-import account_invoice
-import res_company
-import ecofi
-import ecoservice_financeinterface_datev_installer
+
+from openerp.addons.ecoservice_financeinterface.exceptions import FinanceinterfaceException
+
+
+class DatevWarning(FinanceinterfaceException):
+    pass
