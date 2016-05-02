@@ -45,7 +45,7 @@ class AccountInvoice(models.Model):
 
         for rec in self:
             if rec.is_datev_validation_active():
-                if silent:  # Kürze, performantere Version ohne String- und Exception-Handling
+                if silent:  # Shorter, more performant version w/o string and exception handling
                     for line in rec.invoice_line:
                         if not line.perform_datev_validation(silent=True):
                             return False
@@ -57,8 +57,8 @@ class AccountInvoice(models.Model):
                             is_valid = False
                             errors.append(dw.message)
 
-        if not silent and not is_valid:
-            raise exceptions.DatevWarning('\n'.join(errors))
+        if not (silent or is_valid):
+            raise exceptions.DatevWarning(u'\n'.join(errors))
 
         return is_valid
 
@@ -80,10 +80,10 @@ class AccountInvoiceLine(models.Model):
         :rtype: bool
         """
         self.ensure_one()
-        if not self.perform_datev_validation_applicability_check():
+        if not self.is_datev_validation_applicable():
             return True
         is_valid = len(self.invoice_line_tax_id) == 1 and self.account_id.datev_steuer == self.invoice_line_tax_id
-        if not silent and not is_valid:
+        if not (silent or is_valid):
             raise exceptions.DatevWarning(
                 _(u'Line {line}: The taxes specified in the invoice line ({tax_line}) and the corresponding account ({tax_account}) mismatch!').format(
                     line=line_no, tax_line=self.invoice_line_tax_id.description, tax_account=self.account_id.datev_steuer.description
@@ -92,7 +92,7 @@ class AccountInvoiceLine(models.Model):
         return is_valid
 
     @api.multi
-    def perform_datev_validation_applicability_check(self):
+    def is_datev_validation_applicable(self):
         """
         Tests if an invoice line is applicable to datev checks or not.
 
@@ -100,4 +100,4 @@ class AccountInvoiceLine(models.Model):
         :rtype: bool
         """
         self.ensure_one()
-        return self.account_id.automatic and bool(self.account_id.datev_steuer)
+        return self.account_id.automatic
