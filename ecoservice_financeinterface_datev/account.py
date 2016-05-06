@@ -33,7 +33,7 @@ class account_account(osv.osv):
         'ustuebergabe': fields.boolean('Datev UST-ID', help=_("""Is required when transferring
                 a sales tax identification number  from the account partner (e.g. EU-Invoice)""")),
         'automatic': fields.boolean('Datev Automatikkonto'),
-        'datev_steuer': fields.many2one('account.tax', 'Datev Steuerkonto'),
+        'datev_steuer': fields.many2one('account.tax', 'Datev Steuerkonto', domain=[('buchungsschluessel', '!=', -1)]),
         'datev_steuer_erforderlich': fields.boolean('Steuerbuchung erforderlich?'),
     }
 
