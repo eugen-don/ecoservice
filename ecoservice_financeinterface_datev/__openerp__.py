@@ -22,7 +22,7 @@
 ##############################################################################
 {  # pylint: disable-msg=W0104
     "name": "Ecoservice Financial Interface Datev",
-    "version": "1.2",
+    "version": "1.2.1",
     "depends": ["ecoservice_financeinterface", "mail"],
     "author": "ecoservice",
     "website": "www.ecoservice.de",

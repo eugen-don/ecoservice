@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*-
-""" The res_company module extends the original OpenERP res_company objects with different attributes and methods
-"""
 ##############################################################################
 #    ecoservice_financeinterface
 #    Copyright (c) 2013 ecoservice GbR (<http://www.ecoservice.de>).
@@ -23,29 +21,20 @@
 #    Copyright (C) 2004-2010 Tiny SPRL (<http://tiny.be>).
 ##############################################################################
 
-from openerp.osv import osv
-from openerp.osv import fields
+from openerp import models, fields
 
-class res_company(osv.osv):
+
+class ResCompany(models.Model):
     """ Inherits the res.company class and adds methods and attributes
-    
+
     .. automethod:: _finance_interface_selection
     """
-    _inherit = "res.company"
-    
-    def _finance_interface_selection(self, cr, uid, context={}):
-        """Method that can be used by other Modules to add their interface to the selection of possible export formats 
-        the stored value will be used as context variable export_interface
-        
-        .. seealso:: 
-            :class:`ecoservice_financeinterface.ecofi.ecofi.ecofi_buchungen`
-        """
-        return [('none','None')]
-    
-    _columns = {
-                'finance_interface': fields.selection(_finance_interface_selection, 'Finance Interface'),
-                'journal_ids': fields.many2many('account.journal', 'res_company_account_journal',
-                                                        'res_company_id', 'account_journal_id', 'Journal', 
-                                                        domain="[('company_id', '=', active_id)]"),
-    }
-res_company()
+    _inherit = 'res.company'
+
+    finance_interface = fields.Selection(selection=[('none', 'None')])
+    journal_ids = fields.Many2many(comodel_name='account.journal',
+                                   relation='res_company_account_journal',
+                                   column1='res_company_id',
+                                   column2='account_journal_id',
+                                   string='Journal',
+                                   domain="[('company_id', '=', active_id)]")
