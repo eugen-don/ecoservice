@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*-
-""" The res_company module extends the original OpenERP res_company objects with different attributes and methods
-"""
 ##############################################################################
 #    ecoservice_financeinterface_datev
 #    Copyright (c) 2013 ecoservice GbR (<http://www.ecoservice.de>).
@@ -23,7 +21,7 @@
 #    Copyright (C) 2004-2010 Tiny SPRL (<http://tiny.be>).
 ##############################################################################
 
-from openerp import api, fields, models
+from openerp import fields, models
 
 
 class ResCompany(models.Model):
@@ -33,20 +31,6 @@ class ResCompany(models.Model):
     """
     _inherit = 'res.company'
 
-    @api.multi
-    def _finance_interface_selection(self):
-        """Appends datev as possible export format
-
-        .. seealso::
-            :class:`ecoservice_financeinterface.ecofi.ecofi.ecofi_buchungen`
-        """
-        res = super(ResCompany, self)._finance_interface_selection()
-        res.append(('datev', 'Datev'))
-        return res
-
-    finance_interface = fields.Selection(_finance_interface_selection, 'Finance Interface')
-    exportmethod = fields.Selection([
-        ('netto', 'netto'),
-        ('brutto', 'brutto')
-    ], 'Export method')
+    finance_interface = fields.Selection(selection_add=[('datev', 'Datev')], string='Finance Interface')
+    exportmethod = fields.Selection(selection=[('netto', 'netto'), ('brutto', 'brutto')], string='Export method')
     enable_datev_checks = fields.Boolean('Perform Datev Checks', default=True)
