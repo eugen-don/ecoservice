@@ -49,12 +49,10 @@ class account_move(orm.Model):
         :param context: context arguments, like lang, time zone
         """
         context = context or dict()
-        for thismove in self.browse(cr, uid, ids, context):
-            if 'delete_none' in context:
-                if context['delete_none'] is True:
-                    continue
-            if thismove.vorlauf_id:
-                raise osv.except_osv(_('Warning!'), _('Account moves which are already in an export can not be deleted!'))
+        if not context.get('delete_none', False):
+            for thismove in self.browse(cr, uid, ids, context):
+                if thismove.vorlauf_id:
+                    raise orm.except_orm(_(u'Warning!'), _(u'Account moves which are already in an export can not be deleted!'))
         return super(account_move, self).unlink(cr, uid, ids, context)
 
     def financeinterface_test_move(self, cr, uid, move, context=None):
@@ -66,22 +64,22 @@ class account_move(orm.Model):
             if line.account_id and line.ecofi_account_counterpart:
                 if line.account_id.id != line.ecofi_account_counterpart.id:
                     if line.ecofi_account_counterpart.id not in checkdict:
-                        checkdict[line.ecofi_account_counterpart.id] = {}
+                        checkdict[line.ecofi_account_counterpart.id] = dict()
                         checkdict[line.ecofi_account_counterpart.id]['check'] = 0
                         checkdict[line.ecofi_account_counterpart.id]['real'] = 0
                     checkdict[line.ecofi_account_counterpart.id]['check'] += line.debit - line.credit
                 else:
                     if line.ecofi_account_counterpart.id not in checkdict:
-                        checkdict[line.ecofi_account_counterpart.id] = {}
+                        checkdict[line.ecofi_account_counterpart.id] = dict()
                         checkdict[line.ecofi_account_counterpart.id]['check'] = 0
                         checkdict[line.ecofi_account_counterpart.id]['real'] = 0
                     checkdict[line.ecofi_account_counterpart.id]['real'] += line.debit - line.credit
             else:
-                res += _('Not all move lines have an account and an account counterpart defined.')
+                res += _(u'Not all move lines have an account and an account counterpart defined.')
                 return res
         for key in checkdict:
             if abs(checkdict[key]['check'] + checkdict[key]['real']) > 10 ** -4:
-                res += _('The sum of the account lines debit/credit and the account_counterpart lines debit/credit is no Zero!')
+                res += _(u'The sum of the account lines debit/credit and the account_counterpart lines debit/credit is no Zero!')
                 return res
         return False
 
@@ -95,10 +93,10 @@ class account_move(orm.Model):
                 if error:
                     thiserror += error
                 if thiserror != '':
-                    raise osv.except_osv('Error', thiserror)
+                    raise orm.except_orm('Error', thiserror)
             error = self.financeinterface_test_move(cr, uid, move.id, context=context)
             if error:
-                raise osv.except_osv('Error', error)
+                raise orm.except_orm('Error', error)
         return True
 
     def button_cancel(self, cr, uid, ids, context=None):
@@ -107,7 +105,7 @@ class account_move(orm.Model):
         res = super(account_move, self).button_cancel(cr, uid, ids, context=context)
         for move in self.browse(cr, uid, ids, context=context):
             if move.vorlauf_id:
-                raise osv.except_osv(_('Error!'), _('You cannot modify an already exported move.'))
+                raise orm.except_orm(_(u'Error!'), _(u'You cannot modify an already exported move.'))
             if move.ecofi_autotax:
                 for line in move.line_id:
                     if line.ecofi_move_line_autotax:
@@ -124,7 +122,7 @@ class account_move(orm.Model):
             if move.ecofi_autotax:
                 for line in move.line_id:
                     if self.pool.get('ecofi').is_taxline(cr, line.account_id.id) and not line.ecofi_move_line_autotax:
-                        raise osv.except_osv(_('Error!'), _('You can not create tax lines in an auto tax move.'))
+                        raise orm.except_orm(_(u'Error!'), _(u'You can not create tax lines in an auto tax move.'))
                     self.pool.get('account.move.line').create_update_taxline(cr, uid, [line.id], context=context)
         res = super(account_move, self).post(cr, uid, ids, context=context)
         self.finance_interface_checks(cr, uid, ids, context)
@@ -150,7 +148,7 @@ class account_move_line(orm.Model):
         if context.get('counterpart_name', False):
             if not ids:
                 return []
-            result = []
+            result = list()
             for line in self.browse(cr, uid, ids, context=context):
                 if line.ref:
                     result.append((line.id, (line.name or '') + ' (' + line.ref + ')'))
@@ -302,7 +300,7 @@ class account_invoice_line(orm.Model):
         context = context or dict()
         if vals.get('invoice_line_tax_id', False):
             if len(vals['invoice_line_tax_id'][0][2]) > 1:
-                raise osv.except_osv(_("Error"), _("""There can only be one tax per invoice line"""))
+                raise orm.except_orm(_(u"Error"), _(u"""There can only be one tax per invoice line"""))
         result = super(account_invoice_line, self).create(cr, uid, vals, context=context)
         return result
 
@@ -312,7 +310,7 @@ class account_invoice_line(orm.Model):
         context = context or dict()
         if vals.get('invoice_line_tax_id', False):
             if len(vals['invoice_line_tax_id'][0][2]) > 1:
-                raise osv.except_osv(_("Error"), _("""There can only be one tax per invoice line"""))
+                raise orm.except_orm(_(u"Error"), _(u"""There can only be one tax per invoice line"""))
         return super(account_invoice_line, self).write(cr, uid, ids, vals, context=context)
 
 
@@ -353,8 +351,8 @@ class account_tax(orm.Model):
         if taxes and taxes[0].company_id.tax_calculation_rounding_method == 'round_globally':
             tax_compute_precision += 5
         totalin = totalex = float_round(price_unit * quantity, precision)
-        tin = []
-        tex = []
+        tin = list()
+        tex = list()
         for tax in taxes:
             tin.append(tax)
         tin = self.compute_inv(cr, uid, tin, price_unit, quantity, product=product, partner=partner, precision=tax_compute_precision)

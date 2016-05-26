@@ -41,7 +41,7 @@ class export_ecofi(orm.TransientModel):
     def _get_default_journal(self, cr, uid, context=None):
         context = context or dict()
         user = self.pool.get('res.users').browse(cr, uid, [uid], context)[0]
-        journal_ids = []
+        journal_ids = list()
         if user.company_id.finance_interface:
             for journal in user.company_id.journal_ids:
                 journal_ids.append(journal.id)
@@ -101,7 +101,7 @@ class export_ecofi(orm.TransientModel):
             elif export.export_type == 'date':
                 date_from = export.date_from
                 date_to = export.date_to
-            journal_ids = []
+            journal_ids = list()
             for journal in export.journal_id:
                 journal_ids.append(journal.id)
             vorlauf = exportecofi.ecofi_buchungen(cr, uid, journal_ids=journal_ids, vorlauf_id=thisvorlauf, period=period, context=context, date_from=date_from, date_to=date_to)

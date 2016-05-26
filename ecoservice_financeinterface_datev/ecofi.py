@@ -42,14 +42,13 @@ class ecofi(orm.Model):
         :param uid: the current user’s ID for security checks
         :param context: context arguments, like lang, time zone
         """
-        if context is None:
-            context = {}
+        context = context or dict()
         _logger.info("Starting Move Migration")
         invoice_ids = self.pool.get('account.invoice').search(cr, uid, [])
         counter = 0
         for invoice in self.pool.get('account.invoice').browse(cr, uid, invoice_ids, context=context):
             counter += 1
-            _logger.info(_("Migrate Move %s / %s") % (counter, len(invoice_ids)))
+            _logger.info(_(u"Migrate Move %s / %s") % (counter, len(invoice_ids)))
             if invoice.move_id:
                 self.pool.get('account.move').write(cr, uid, [invoice.move_id.id], {
                     'ecofi_buchungstext': invoice.ecofi_buchungstext or False,
@@ -62,7 +61,7 @@ class ecofi(orm.Model):
                                 if move_line.debit + move_line.credit == abs(invoice_line.price_subtotal):
                                     self.pool.get('account.move.line').write(cr, uid, [move_line.id],
                                                                              {'ecofi_taxid': invoice_line.invoice_line_tax_id[0].id})
-        _logger.info(_("Move Migration Finished"))
+        _logger.info(_(u"Move Migration Finished"))
         return True
 
     def field_config(self, cr, uid, move, line, errorcount, partnererror, thislog, thismovename, faelligkeit, datevdict):
@@ -96,31 +95,17 @@ class ecofi(orm.Model):
             if datevdict['EulandUSTID'] == '':
                 errorcount += 1
                 partnererror.append(move.partner_id.id)
-                thislog = thislog + thismovename + _("Error: No sales tax identification number stored in the partner!\n")
-        return (errorcount, partnererror, thislog, thismovename, datevdict)
+                thislog = thislog + thismovename + _(u"Error: No sales tax identification number stored in the partner!\n")
+        return errorcount, partnererror, thislog, thismovename, datevdict
 
-    def format_umsatz(self, cr, uid, lineumsatz, context=None):
+    @staticmethod
+    def format_revenue(line_revenue):
         """ Returns the formatted amount
-        :param cr: the current row, from the database cursor
-        :param uid: the current user’s ID for security checks
-        :param lineumsatz: amountC
-        :param context: context arguments, like lang, time zone
-        :param lineumsatz:
-        :param context:
+        :param line_revenue: amountC
         """
-        context = context or dict()
-        Umsatz = ''
-        Sollhaben = ''
-        if lineumsatz < 0:
-            Umsatz = str(lineumsatz * -1).replace('.', ',')
-            Sollhaben = 's'
-        if lineumsatz > 0:
-            Umsatz = str(lineumsatz).replace('.', ',')
-            Sollhaben = 'h'
-        if lineumsatz == 0:
-            Umsatz = str(lineumsatz).replace('.', ',')
-            Sollhaben = 's'
-        return Umsatz, Sollhaben
+        debit_credit = 'h' if line_revenue > 0 else 's'
+        revenue = str(abs(line_revenue)).replace('.', ',')
+        return revenue, debit_credit
 
     def format_waehrung(self, cr, uid, line, context=None):
         """ Formats the currency for the export
@@ -167,7 +152,7 @@ class ecofi(orm.Model):
         context = context or dict()
         if context.get('export_interface', '') == 'datev':
             if not bookingdict.get('buchungen', False):
-                bookingdict['buchungen'] = []
+                bookingdict['buchungen'] = list()
             if not bookingdict.get('buchungsheader', False):
                 bookingdict['buchungsheader'] = self.buchungenHeaderDatev()
             faelligkeit = False
@@ -196,9 +181,9 @@ class ecofi(orm.Model):
                         taxamount = self.pool.get('ecofi').calculate_tax(cr, uid, line, context)
                         lineumsatz = lineumsatz + Decimal(str(taxamount))
                         linetax = self.get_line_tax(cr, uid, line)
-                        if line.account_id.automatic is False and linetax:
-                            buschluessel = str(linetax.buchungsschluessel)  # pylint: disable-msg=E1103
-                umsatz, sollhaben = self.format_umsatz(cr, uid, lineumsatz, context=context)
+                        if not line.account_id.automatic and linetax:
+                            buschluessel = str(linetax.buchungsschluessel)
+                umsatz, sollhaben = self.format_revenue(lineumsatz)
                 datevdict = {
                     'Sollhaben': sollhaben,
                     'Umsatz': umsatz,
@@ -222,7 +207,7 @@ class ecofi(orm.Model):
                     'Movename': ustr(move.name)
                 }
                 (errorcount, partnererror, thislog, thismovename, datevdict) = self.field_config(
-                    cr,uid, move, line, errorcount, partnererror, thislog, thismovename, faelligkeit, datevdict)
+                    cr, uid, move, line, errorcount, partnererror, thislog, thismovename, faelligkeit, datevdict)
                 bookingdict['buchungen'].append(self.buchungenCreateDatev(datevdict))
                 buchungszeilencount += 1
         buchungserror, errorcount, thislog, partnererror, buchungszeilencount, bookingdict = super(ecofi, self).generate_csv_move_lines(
@@ -278,5 +263,5 @@ class ecofi(orm.Model):
             datevdict['EUSteuer'].encode('iso-8859-1'),
             datevdict['Basiswaehrungsbetrag'].encode('iso-8859-1'),
             datevdict['Basiswaehrungskennung'].encode('iso-8859-1'),
-            datevdict['Kurs'].encode('iso-8859-1'),
+            datevdict['Kurs'].encode('iso-8859-1')
         ]

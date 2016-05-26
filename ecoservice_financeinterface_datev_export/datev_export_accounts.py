@@ -33,7 +33,7 @@ class ecofi_datev_formate(orm.Model):
         """Method that can be used by other Modules to add their interface to the selection of possible export formats"""
         context = context or dict()
         res = super(ecofi_datev_formate, self)._get_export_type(cr, uid, context=context)
-        res.append(('pktr', _('Accounts')))
+        res.append(('pktr', _(u'Accounts')))
         return res
 
     _columns = {
@@ -74,7 +74,7 @@ class ecofi_datev_formate(orm.Model):
         if thisimport.datev_type == 'pktr':
             res['module'] = 'ecoservice_financeinterface_datev_export'
             res['csv_template'] = 'csv_templates/datev_deb_kred.csv'
-            res['mako_help'] = _("""Possible Mako Object account and partner
+            res['mako_help'] = _(u"""Possible Mako Object account and partner
 
             If you want to export the Code of the account and the Name of the Partner use:
             ${account.code} and ${partner.name} as Makotext.
@@ -89,16 +89,16 @@ class ecofi_datev_formate(orm.Model):
             try:
                 domain = eval(export.datev_domain)
             except:
-                domain = []
+                domain = list()
             account_ids = self.pool.get('account.account').search(cr, uid, domain, order='code asc', context=context)
-            thisline = []
+            thisline = list()
             for spalte in export.csv_spalten:
                 if spalte.mako or 'export_all' in context:
                     thisline.append(ustr(spalte.feldname).encode('encoding' in context and context['encoding'] or 'iso-8859-1'))
             ecofi_csv.writerow(thisline)
             log = ''
             for account in self.pool.get('account.account').browse(cr, uid, account_ids, context=context):
-                thisline = []
+                thisline = list()
                 writeline = True
                 for spalte in export.csv_spalten:
                     if spalte.mako or 'export_all' in context:
@@ -111,7 +111,7 @@ class ecofi_datev_formate(orm.Model):
                             if convertet_value['value'] is not False:
                                 thisline.append(convertet_value['value'])
                             else:
-                                log += _("Account: %s %s could not be exported!\n" % (account.code, spalte.feldname))
+                                log += _(u"Account: %s %s could not be exported!\n" % (account.code, spalte.feldname))
                                 log += "\t %s\n" % (convertet_value['log'])
                                 writeline = False
                                 break

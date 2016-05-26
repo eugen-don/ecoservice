@@ -53,11 +53,11 @@ class ecofi_datev_formate(orm.Model):
         """ Tries to convert given Value into the Datev Format"""
         context = context or dict()
         checkdict = {
-            'Konto': ("int('%s')" % (value), _('in an Integer')),
-            'Zahl': ("int('%s')" % (value), _('in an Integer')),
-            'Text': ("str('%s')" % (value), _('in a Text')),
-            'Datum': ("time.strftime('%d.%m.%Y', time.strptime('" + ustr(value) + "','%d-%m-%Y'))", _('in a Date')),
-            'Betrag': ("str(Decimal('%s')).replace('.',',')" % (value), _('in an Decimal')),
+            'Konto': ("int('%s')" % (value), _(u'in an Integer')),
+            'Zahl': ("int('%s')" % (value), _(u'in an Integer')),
+            'Text': ("str('%s')" % (value), _(u'in a Text')),
+            'Datum': ("time.strftime('%d.%m.%Y', time.strptime('" + ustr(value) + "','%d-%m-%Y'))", _(u'in a Date')),
+            'Betrag': ("str(Decimal('%s')).replace('.',',')" % (value), _(u'in an Decimal')),
         }
         res = {'log': '', 'value': False}
         if spaltentyp in checkdict:
@@ -68,7 +68,7 @@ class ecofi_datev_formate(orm.Model):
                     value = eval(checkdict[spaltentyp][0])
                     res['value'] = ustr(value).encode('encoding' in context and context['encoding'] or 'iso-8859-1')
             except:
-                res['log'] = _("Value %s could not be convertet %s!" % (value, checkdict[spaltentyp][1]))
+                res['log'] = _(u"Value %s could not be convertet %s!" % (value, checkdict[spaltentyp][1]))
         return res
 
     def generate_export_csv(self, cr, uid, export, ecofi_csv, context=None):
@@ -80,54 +80,32 @@ class ecofi_datev_formate(orm.Model):
         context = context or dict()
         buf = cStringIO.StringIO()
         ecofi_csv = csv.writer(buf, delimiter=',', quotechar='"')
-        log = ''
         for export in self.browse(cr, uid, ids, context=context):
             export_info = self.generate_export_csv(cr, uid, export, ecofi_csv, context=context)
-        res = {}
-        res['file'] = base64.encodestring(buf.getvalue())
-        res['log'] = export_info['log']
-        return res
+        return {
+            'file': base64.encodestring(buf.getvalue()),
+            'log': export_info['log']
+        }
 
-    def generate_csv_header_definition(self):
+    @staticmethod
+    def generate_csv_header_definition():
         """CSV-Template Header Definition Dictionary Definition"""
-        importattrs = {}
-        importattrs['mako'] = {
-            'header': 'Mako',
-            'fieldnumber': False
+        def hf_dict(header):
+            return {
+                'header': header,
+                'fieldnumber': False
+            }
+        return {
+            'mako': hf_dict(u'Mako'),
+            'datevid': hf_dict(u'Nr.'),
+            'feldname': hf_dict(u'Feldname'),
+            'typ': hf_dict(u'Typ'),
+            'nks': hf_dict(u'NKS'),
+            'laenge': hf_dict(u'Länge'),
+            'maxlaenge': hf_dict(u'Max. Länge'),
+            'beschreibung': hf_dict(u'Beschreibung'),
+            'mussfeld': hf_dict(u'Muss-Feld')
         }
-        importattrs['datevid'] = {
-            'header': 'Nr.',
-            'fieldnumber': False
-        }
-        importattrs['feldname'] = {
-            'header': 'Feldname',
-            'fieldnumber': False
-        }
-        importattrs['typ'] = {
-            'header': 'Typ',
-            'fieldnumber': False
-        }
-        importattrs['nks'] = {
-            'header': 'NKS',
-            'fieldnumber': False
-        }
-        importattrs['laenge'] = {
-            'header': 'Länge',
-            'fieldnumber': False
-        }
-        importattrs['maxlaenge'] = {
-            'header': 'Max. Länge',
-            'fieldnumber': False
-        }
-        importattrs['beschreibung'] = {
-            'header': 'Beschreibung',
-            'fieldnumber': False
-        }
-        importattrs['mussfeld'] = {
-            'header': 'Muss-Feld',
-            'fieldnumber': False
-        }
-        return importattrs
 
     def getfields_defaults(self, cr, thisimport, context=None):
         """ Hook Method to fill the defaults like template.csv etc"""
@@ -145,7 +123,7 @@ class ecofi_datev_formate(orm.Model):
                                              delimiter=',')
                     counter = 0
                     importattrs = self.generate_csv_header_definition()
-                    for line in importliste:
+                    for counter, line in enumerate(importliste):
                         if counter == 0:
                             fieldcounter = 0
                             for value in line:
@@ -155,8 +133,8 @@ class ecofi_datev_formate(orm.Model):
                                 fieldcounter += 1
                             for attr in importattrs.keys():
                                 if importattrs[attr]['fieldnumber'] is False:
-                                    raise osv.except_osv(_('Error !'),
-                                                         _('Importformat not correct, Headervalue %s not found in the csv!' % (importattrs[attr]['header'])))
+                                    raise orm.except_orm(_(u'Error !'),
+                                                         _(u'Importformat not correct, Headervalue %s not found in the csv!' % (importattrs[attr]['header'])))
                         else:
                             thisspalte = self.pool.get('ecofi.datev.spalten').search(cr, uid, [('import_id', '=', thisimport.id),
                                                                                                ('datevid', '=', int(line[importattrs['datevid']['fieldnumber']]))
@@ -174,7 +152,6 @@ class ecofi_datev_formate(orm.Model):
                                 self.pool.get('ecofi.datev.spalten').write(cr, uid, thisspalte, spaltedict, context)
                             else:
                                 self.pool.get('ecofi.datev.spalten').create(cr, uid, spaltedict, context)
-                        counter += 1
         return True
 
 
@@ -192,5 +169,5 @@ class ecofi_datev_spalten(orm.Model):
         'mussfeld': fields.boolean('Mandatory field', readonly=True),
         'beschreibung': fields.text('Description', readonly=True),
         'import_id': fields.many2one('ecofi.datev.formate', 'Import', required=True, ondelete='cascade', select=True),
-        'mako': fields.text('Mako'),
+        'mako': fields.text('Mako')
     }

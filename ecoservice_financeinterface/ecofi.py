@@ -40,7 +40,7 @@ class ecofi(orm.Model):
     """
     _name = 'ecofi'
     _description = 'Ecoservice Financial Interface'
-    _zahlungsbedingungen = []
+    _zahlungsbedingungen = list()
     _columns = {
         'name': fields.char('Exportname', size=64, required=True, readonly=True),
         'journale': fields.char('Journals', size=128, required=True, readonly=True),
@@ -67,7 +67,7 @@ class ecofi(orm.Model):
         :param context: context arguments, like lang, time zone
         :param default: default values
         """
-        raise osv.except_osv(_('Warning!'), _('Exports cannot be duplicated.'))
+        raise orm.except_orm(_(u'Warning!'), _(u'Exports cannot be duplicated.'))
 
     def is_taxline(self, cr, account_id):
         """Method to check if the selected account is a tax account
@@ -182,9 +182,9 @@ class ecofi(orm.Model):
         ecofikonto = False
         ecofikontoid = False
         ecofikonto_no_invoice = False
-        sollkonto = []
-        habenkonto = []
-        nullkonto = []
+        sollkonto = list()
+        habenkonto = list()
+        nullkonto = list()
         error = False
         for line in move.line_id:
             Umsatz = Decimal(str(0))
@@ -207,14 +207,14 @@ class ecofi(orm.Model):
             ecofikonto = habenkonto[0]
         elif sollcount > 1 and habencount > 1:
             if sollcount > habencount:
-                habennotax = []
+                habennotax = list()
                 for haben in habenkonto:
                     if self.is_taxline(cr, haben.id) is False:
                         habennotax.append(haben)
                 if len(habennotax) == 1:
                     ecofikonto = habennotax[0]
             elif sollcount < habencount:
-                sollnotax = []
+                sollnotax = list()
                 for soll in sollkonto:
                     if self.is_taxline(cr, soll.id) is False:
                         sollnotax.append(soll)
@@ -237,7 +237,7 @@ class ecofi(orm.Model):
                         inbooking = True
                         ecofikonto = hk
             if inbooking is False and invoice_ids:
-                error = _("The main account of the booking could not be resolved, the move has %s credit- and %s debitlines!") % (sollcount, habencount)
+                error = _(u"The main account of the booking could not be resolved, the move has %s credit- and %s debitlines!") % (sollcount, habencount)
                 error += "\n"
             else:
                 ecofikonto = ecofikonto_no_invoice
@@ -326,14 +326,14 @@ class ecofi(orm.Model):
         if len(journal_ids) == 0:
             if user.company_id.journal_ids:
                 if len(user.company_id.journal_ids) == 0:
-                    return (_("There is no journal for the ecofi_export configured!"), False, 'none', buchungserror, partnererror)
+                    return (_(u"There is no journal for the ecofi_export configured!"), False, 'none', buchungserror, partnererror)
                 journalname = ''
                 for journal in user.company_id.journal_ids:
                     journalname += ustr(journal.name) + ','
                     journal_ids.append(journal.id)
                 journalname = journalname[:-1]
             else:
-                return (_("There is no journal for the ecofi_export configured!"), False, 'none', buchungserror, partnererror)
+                return (_(u"There is no journal for the ecofi_export configured!"), False, 'none', buchungserror, partnererror)
         else:
             journalname = ''
             for journal in self.pool.get('account.journal').browse(cr, uid, journal_ids, context=context):
@@ -374,16 +374,16 @@ class ecofi(orm.Model):
                 })
             else:
                 vorlaufname = self.pool.get('ecofi').browse(cr, uid, [vorlauf_id], context=context)[0]['name']
-            thislog += _("This export is conducted under the Vorlaufname: %s") % (vorlaufname)
+            thislog += _(u"This export is conducted under the Vorlaufname: %s") % (vorlaufname)
             thislog += "\n"
             thislog += "-----------------------------------------------------------------------------------\n"
-            thislog += _("Start export")
+            thislog += _(u"Start export")
             thislog += "\n"
             bookingdictcount = 0
             buchungszeilencount = 0
             errorcount = 0
             warncount = 0
-            bookingdict = {}
+            bookingdict = dict()
             self.pre_export(cr, uid, account_move_ids, context)
             for move in self.pool.get('account.move').browse(cr, uid, account_move_ids):
                 self.pool.get('account.move').write(cr, uid, [move.id], {'vorlauf_id': vorlauf_id})
@@ -396,16 +396,16 @@ class ecofi(orm.Model):
                 out = base64.encodestring(buf.getvalue())
             else:
                 out = base64.encodestring(buf.getvalue())
-            thislog += _("Export finished")
+            thislog += _(u"Export finished")
             thislog += "\n"
             thislog += "-----------------------------------------------------------------------------------\n\n"
-            thislog += _("Edited posting record : %s") % (bookingdictcount)
+            thislog += _(u"Edited posting record : %s") % (bookingdictcount)
             thislog += "\n"
-            thislog += _("Edited posting lines: %s") % (buchungszeilencount)
+            thislog += _(u"Edited posting lines: %s") % (buchungszeilencount)
             thislog += "\n"
-            thislog += _("Warnings: %s") % (warncount)
+            thislog += _(u"Warnings: %s") % (warncount)
             thislog += "\n"
-            thislog += _("Error: %s") % (errorcount)
+            thislog += _(u"Error: %s") % (errorcount)
             thislog += "\n"
             self.pool.get('ecofi').write(cr, uid, vorlauf_id, {
                 'csv_file': out,
@@ -415,7 +415,7 @@ class ecofi(orm.Model):
                 'move_error_ids': [(6, 0, list(set(buchungserror)))],
             })
         else:
-            thislog = _("No posting records found")
+            thislog = _(u"No posting records found")
             out = False
             vorlauf_id = False
         return vorlauf_id

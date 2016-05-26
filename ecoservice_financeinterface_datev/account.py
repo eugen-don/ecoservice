@@ -79,20 +79,20 @@ class account_move(orm.Model):
                 if not self.pool.get('ecofi').is_taxline(cr, line.account_id.id) or line.ecofi_bu == 'SD':
                     linetax = self.pool.get('ecofi').get_line_tax(cr, uid, line)
                     if line.account_id.automatic is True and not line.account_id.datev_steuer:
-                        error += _("""The account %s is an Autoaccount, although the automatic taxes are not configured!\n""") % (line.account_id.code)
+                        error += _(u"""The account %s is an Autoaccount, although the automatic taxes are not configured!\n""") % (line.account_id.code)
                     if line.account_id.datev_steuer_erforderlich is True and linetax is False:
-                        error += _("""The Account requires a tax, although the moveline %s has no tax!\n""") % (linecount)
+                        error += _(u"""The Account requires a tax, although the moveline %s has no tax!\n""") % (linecount)
                     if line.account_id.automatic is True and linetax:
                         if line.account_id.datev_steuer:
                             if linetax.id != line.account_id.datev_steuer.id:
-                                error += _("""The account is an Autoaccount, altough the taxaccount (%s) in the moveline %s is an other than the configured %s!\n""") % (linecount,
+                                error += _(u"""The account is an Autoaccount, altough the taxaccount (%s) in the moveline %s is an other than the configured %s!\n""") % (linecount,
                                                                                                                                                                          linetax.name, line.account_id.datev_steuer.name)
                         else:
                             if linetax:
-                                error += _("""The account is an Autoaccount, altough the taxaccount (%s) in the moveline %s is an other than the configured %s!\n""") % (linecount,
+                                error += _(u"""The account is an Autoaccount, altough the taxaccount (%s) in the moveline %s is an other than the configured %s!\n""") % (linecount,
                                                                                                                                                                          linetax.name, line.account_id.datev_steuer.name)
                     if line.account_id.automatic is True and linetax is False:
-                        error += _("""The account is an Autoaccount, altough the taxaccount in the moveline %s is not set!\n""") % (linecount)
+                        error += _(u"""The account is an Autoaccount, altough the taxaccount in the moveline %s is not set!\n""") % (linecount)
                     if line.account_id.automatic is False and linetax and linetax.buchungsschluessel < 0:  # pylint: disable-msg=E1103
                         error += _(ustr("""The bookingkey for the tax %s is not configured!\n""")) % (linetax.name)  # pylint: disable-msg=E1103,C0301
         return error
@@ -110,14 +110,14 @@ class account_move(orm.Model):
                         if line.account_id.datev_steuer:
                             self.pool.get('account.move.line').write(cr, uid, [line.id], {'ecofi_taxid': line.account_id.datev_steuer.id}, context=context)
                         else:
-                            error += _("""The Account is an Autoaccount, although the moveline %s has no tax!\n""") % (linecount)
+                            error += _(u"""The Account is an Autoaccount, although the moveline %s has no tax!\n""") % (linecount)
         return error
 
     def datev_tax_check(self, cr, uid, move, context=None):
         context = context or dict()
         error = ''
         linecount = 0
-        tax_values = {}
+        tax_values = dict()
         linecounter = 0
         for line in move.line_id:
             linecount += 1
@@ -152,7 +152,7 @@ class account_move(orm.Model):
             sum_datev += value['datev']
 
         if Decimal(str(abs(sum_real - sum_datev))) > Decimal(str(10 ** -2 * linecounter)):
-            error += _("""The sum for the tax is different between booked %s and calculated %s!\n""" % (sum_real, sum_datev))
+            error += _(u"""The sum for the tax is different between booked %s and calculated %s!\n""" % (sum_real, sum_datev))
 
         return error
 
@@ -180,7 +180,7 @@ class account_move(orm.Model):
         for move in self.browse(cr, uid, ids, context=context):
             error = self.datev_checks(cr, uid, move, context)
             if error:
-                raise osv.except_osv('Datev Error', error)
+                raise orm.except_orm('Datev Error', error)
         return res
 
 

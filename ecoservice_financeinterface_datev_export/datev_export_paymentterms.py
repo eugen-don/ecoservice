@@ -33,7 +33,7 @@ class ecofi_datev_formate(orm.Model):
         """Method that can be used by other Modules to add their interface to the selection of possible export formats"""
         context = context or dict()
         res = super(ecofi_datev_formate, self)._get_export_type(cr, uid, context=context)
-        res.append(('pterm', _('Paymentterms')))
+        res.append(('pterm', _(u'Paymentterms')))
         return res
 
     _columns = {
@@ -47,7 +47,7 @@ class ecofi_datev_formate(orm.Model):
         if thisimport.datev_type == 'pterm':
             res['module'] = 'ecoservice_financeinterface_datev_export'
             res['csv_template'] = 'csv_templates/datev_payment_terms.csv'
-            res['mako_help'] = _("""Possible Mako Object paymentterm
+            res['mako_help'] = _(u"""Possible Mako Object paymentterm
             Paymentterm Values:
                'number'
                'name'
@@ -91,10 +91,10 @@ class ecofi_datev_formate(orm.Model):
                 skontocount += 1
         if res['netdays'] is False:
             res['error'] = True
-            res['log'] = _('Paymentterm %s has no balance line' % (paymentterm.name))
+            res['log'] = _(u'Paymentterm %s has no balance line' % (paymentterm.name))
         if skontocount > 1:
             res['error'] = True
-            res['log'] = _('Paymentterm %s has more than 2 percent lines' % (paymentterm.name))
+            res['log'] = _(u'Paymentterm %s has more than 2 percent lines' % (paymentterm.name))
         return res
 
     def generate_export_csv(self, cr, uid, export, ecofi_csv, context=None):
@@ -105,16 +105,16 @@ class ecofi_datev_formate(orm.Model):
             try:
                 domain = eval(export.datev_domain)
             except:
-                domain = []
+                domain = list()
             paymentterm_ids = self.pool.get('account.payment.term').search(cr, uid, domain, order='id asc', context=context)
-            thisline = []
+            thisline = list()
             for spalte in export.csv_spalten:
                 if spalte.mako or 'export_all' in context:
                     thisline.append(ustr(spalte.feldname).encode('encoding' in context and context['encoding'] or 'iso-8859-1'))
             ecofi_csv.writerow(thisline)
             log = ''
             for paymentterm in self.pool.get('account.payment.term').browse(cr, uid, paymentterm_ids, context=context):
-                thisline = []
+                thisline = list()
                 writeline = True
                 for spalte in export.csv_spalten:
                     if spalte.mako or 'export_all' in context:
@@ -129,14 +129,14 @@ class ecofi_datev_formate(orm.Model):
                                     if convertet_value['value'] is not False:
                                         thisline.append(convertet_value['value'])
                                     else:
-                                        log += _("Paymentterm: %s could not be exported!\n" % (paymentterm.name))
+                                        log += _(u"Paymentterm: %s could not be exported!\n" % (paymentterm.name))
                                         log += "\t %s\n" % (convertet_value['log'])
                                         writeline = False
                                         break
                                 else:
                                     thisline.append('')
                             else:
-                                log += _("Paymentterm: %s could not be exported!\n" % (paymentterm.name))
+                                log += _(u"Paymentterm: %s could not be exported!\n" % (paymentterm.name))
                                 log += "\t %s\n" % (thispaymentterm['log'])
                                 writeline = False
                                 break
