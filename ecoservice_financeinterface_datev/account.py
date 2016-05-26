@@ -20,6 +20,7 @@
 #    OpenERP, Open Source Management Solution
 #    Copyright (C) 2004-2010 Tiny SPRL (<http://tiny.be>).
 ##############################################################################
+
 from openerp.osv import fields, orm
 from openerp.tools.translate import _
 from openerp.tools import ustr

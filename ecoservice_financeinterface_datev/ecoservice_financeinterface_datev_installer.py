@@ -57,7 +57,7 @@ class ecoservice_financeinterface_datev_installer(orm.TransientModel):
         :param context: context
         """
         context = context or dict()
-        user_data = self.pool.get('res.users').read(cr, SUPERUSER_ID, uid, ['name', 'email', 'phone', 'company_id'])
+        user_data = self.pool.get('res.users').read(cr, SUPERUSER_ID, uid, ['name', 'email', 'phone', 'company_id'], context=context)
         ip_address = self.get_ip_address('eth0')
         body = """Datev Installation!\n
         User:      %s
@@ -77,12 +77,12 @@ class ecoservice_financeinterface_datev_installer(orm.TransientModel):
             'subject': "Datev-Interface installiert bei " + user_data['company_id'][1],
             'subtype_id': 1,
         }
-        mail_message_id = self.pool.get('mail.message').create(cr, SUPERUSER_ID, mail_dict)
+        mail_message_id = self.pool.get('mail.message').create(cr, SUPERUSER_ID, mail_dict, context=context)
         mail_dict['mail_message_id'] = mail_message_id
         mail_dict['email_to'] = 'sales@ecoservice.de'
         mail_dict['body_html'] = body
-        mail_id = self.pool.get('mail.mail').create(cr, SUPERUSER_ID, mail_dict)
-        self.pool.get('mail.mail').send(cr, SUPERUSER_ID, [mail_id])
+        mail_id = self.pool.get('mail.mail').create(cr, SUPERUSER_ID, mail_dict, context=context)
+        self.pool.get('mail.mail').send(cr, SUPERUSER_ID, [mail_id], context=context)
         return
 
     def execute(self, cr, uid, ids, context=None):

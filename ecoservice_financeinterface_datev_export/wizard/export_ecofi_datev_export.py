@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+""" The export_ecofi_buchungsaetze module provides the wizard object the user calls when exporting
+"""
 ##############################################################################
 #    ecoservice_financeinterface_datev_export
 #    Copyright (c) 2013 ecoservice GbR (<http://www.ecoservice.de>).
@@ -20,9 +22,8 @@
 #    OpenERP, Open Source Management Solution
 #    Copyright (C) 2004-2010 Tiny SPRL (<http://tiny.be>).
 ##############################################################################
-""" The export_ecofi_buchungsaetze module provides the wizard object the user calls when exporting
-"""
-from osv import orm, fields
+
+from openerp.osv import orm, fields
 import datetime
 
 

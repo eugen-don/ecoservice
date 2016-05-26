@@ -22,6 +22,7 @@
 #    OpenERP, Open Source Management Solution
 #    Copyright (C) 2004-2010 Tiny SPRL (<http://tiny.be>).
 ##############################################################################
+
 from openerp.osv import orm
 from decimal import Decimal
 from openerp.tools.translate import _
@@ -44,7 +45,7 @@ class ecofi(orm.Model):
         """
         context = context or dict()
         _logger.info("Starting Move Migration")
-        invoice_ids = self.pool.get('account.invoice').search(cr, uid, [])
+        invoice_ids = self.pool.get('account.invoice').search(cr, uid, [], context=context)
         counter = 0
         for invoice in self.pool.get('account.invoice').browse(cr, uid, invoice_ids, context=context):
             counter += 1
@@ -53,7 +54,7 @@ class ecofi(orm.Model):
                 self.pool.get('account.move').write(cr, uid, [invoice.move_id.id], {
                     'ecofi_buchungstext': invoice.ecofi_buchungstext or False,
                 })
-                move = self.pool.get('account.move').browse(cr, uid, invoice.move_id.id)
+                move = self.pool.get('account.move').browse(cr, uid, invoice.move_id.id, context=context)
                 for invoice_line in invoice.invoice_line:
                     if invoice_line.invoice_line_tax_id:
                         for move_line in move.line_id:
@@ -99,12 +100,12 @@ class ecofi(orm.Model):
         return errorcount, partnererror, thislog, thismovename, datevdict
 
     @staticmethod
-    def format_revenue(line_revenue):
+    def format_umsatz(lineumsatz):
         """ Returns the formatted amount
-        :param line_revenue: amountC
+        :param lineumsatz: amountC
         """
-        debit_credit = 'h' if line_revenue > 0 else 's'
-        revenue = str(abs(line_revenue)).replace('.', ',')
+        debit_credit = 'h' if lineumsatz > 0 else 's'
+        revenue = str(abs(lineumsatz)).replace('.', ',')
         return revenue, debit_credit
 
     def format_waehrung(self, cr, uid, line, context=None):
@@ -183,7 +184,7 @@ class ecofi(orm.Model):
                         linetax = self.get_line_tax(cr, uid, line)
                         if not line.account_id.automatic and linetax:
                             buschluessel = str(linetax.buchungsschluessel)
-                umsatz, sollhaben = self.format_revenue(lineumsatz)
+                umsatz, sollhaben = self.format_umsatz(lineumsatz)
                 datevdict = {
                     'Sollhaben': sollhaben,
                     'Umsatz': umsatz,
