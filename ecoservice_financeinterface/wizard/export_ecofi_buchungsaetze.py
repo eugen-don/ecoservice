@@ -23,7 +23,7 @@
 #    Copyright (C) 2004-2010 Tiny SPRL (<http://tiny.be>).
 ##############################################################################
 import time
-from osv import osv, fields
+from openerp.osv import osv, fields
 
 
 class export_ecofi(osv.osv_memory):
@@ -36,12 +36,10 @@ class export_ecofi(osv.osv_memory):
         period_default = self.pool.get('account.period').search(cr, uid, [('date_start', '<=', time.strftime('%Y-%m-%d')),
                                                                      ('date_stop', '>=', time.strftime('%Y-%m-%d')),
                                                                      ('company_id', '=', user.company_id.id)])
-        if len(period_default) == 0:
-            return False
-        else:
-            return period_default[0]
+        return False if len(period_default) == 0 else period_default[0]
 
     def _get_default_journal(self, cr, uid, context=None):
+        context = context or dict()
         user = self.pool.get('res.users').browse(cr, uid, [uid], context)[0]
         journal_ids = []
         if user.company_id.finance_interface:
@@ -49,7 +47,8 @@ class export_ecofi(osv.osv_memory):
                 journal_ids.append(journal.id)
         return journal_ids
 
-    def _get_default_vorlauf(self, cr, uid, context={}):
+    def _get_default_vorlauf(self, cr, uid, context=None):
+        context = context or dict()
         vorlauf = False
         if 'active_model' in context and 'active_id' in context:
             if context['active_model'] == 'ecofi':
@@ -116,4 +115,3 @@ class export_ecofi(osv.osv_memory):
             'target': 'current',
             'res_id': vorlauf,
         }
-export_ecofi()

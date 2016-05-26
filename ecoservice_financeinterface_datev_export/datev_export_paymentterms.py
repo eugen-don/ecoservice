@@ -30,8 +30,9 @@ from mako.template import Template as MakoTemplate
 class ecofi_datev_formate(osv.osv):
     _inherit = 'ecofi.datev.formate'
 
-    def _get_export_type(self, cr, uid, context={}):
+    def _get_export_type(self, cr, uid, context=None):
         """Method that can be used by other Modules to add their interface to the selection of possible export formats"""
+        context = context or dict()
         res = super(ecofi_datev_formate, self)._get_export_type(cr, uid, context=context)
         res.append(('pterm', _('Paymentterms')))
         return res
@@ -42,8 +43,7 @@ class ecofi_datev_formate(osv.osv):
 
     def getfields_defaults(self, cr, thisimport, context=None):
         """Return the Defaults MakeHelp and CSV Template File"""
-        if context is None:
-            context = {}
+        context = context or dict()
         res = super(ecofi_datev_formate, self).getfields_defaults(cr, thisimport, context=context)
         if thisimport.datev_type == 'pterm':
             res['module'] = 'ecoservice_financeinterface_datev_export'
@@ -65,27 +65,26 @@ class ecofi_datev_formate(osv.osv):
 
     def generate_payment_terms(self, cr, uid, paymentterm, context=None):
         """ Generate Payment Term for Mako"""
-        if context is None:
-            context = {}
+        context = context or dict()
         res = {
-               'number': paymentterm.id,
-               'name': paymentterm.name,
-               'typ': 1,
-               'netdays': False,
-               'skonto1days': '',
-               'skonto1percent': '',
-               'skonto2days': '',
-               'skonto2percent': '',
-               'error': False,
-               'log': ''
-               }
+            'number': paymentterm.id,
+            'name': paymentterm.name,
+            'typ': 1,
+            'netdays': False,
+            'skonto1days': '',
+            'skonto1percent': '',
+            'skonto2days': '',
+            'skonto2percent': '',
+            'error': False,
+            'log': ''
+        }
         skontocount = 0
         for line in paymentterm.line_ids:
             if line.value == 'balance':
                 res['netdays'] = line.days
             elif line.value == 'procent':
                 if skontocount == 0:
-                    res['skonto1days'] = line.days 
+                    res['skonto1days'] = line.days
                     res['skonto1percent'] = line.value_amount * 100
                 elif skontocount == 1:
                     res['skonto2days'] = line.days
@@ -101,8 +100,7 @@ class ecofi_datev_formate(osv.osv):
 
     def generate_export_csv(self, cr, uid, export, ecofi_csv, context=None):
         """Funktion that fills the CSV Export"""
-        if context is None:
-            context = {}
+        context = context or dict()
         res = super(ecofi_datev_formate, self).generate_export_csv(cr, uid, export, ecofi_csv, context=context)
         if export.datev_type == 'pterm':
             try:
@@ -149,4 +147,3 @@ class ecofi_datev_formate(osv.osv):
                     ecofi_csv.writerow(thisline)
             res['log'] += log
         return res
-ecofi_datev_formate()

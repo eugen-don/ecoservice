@@ -32,12 +32,12 @@ import openerp.addons.decimal_precision as dp
 class account_move(osv.osv):
     """ Inherits the account.move class and adds methods and attributes
     """
-    _inherit = "account.move"
+    _inherit = 'account.move'
     _columns = {
-                'vorlauf_id': fields.many2one('ecofi', 'Export', readonly=True, ondelete='set null', select=2),
-                'ecofi_buchungstext': fields.char('Export Voucher Text', size=30),
-                'ecofi_manual': fields.boolean('Set Counteraccounts manual'),
-                'ecofi_autotax': fields.boolean('Automatic Tax Lines'),
+        'vorlauf_id': fields.many2one('ecofi', 'Export', readonly=True, ondelete='set null', select=2),
+        'ecofi_buchungstext': fields.char('Export Voucher Text', size=30),
+        'ecofi_manual': fields.boolean('Set Counteraccounts manual'),
+        'ecofi_autotax': fields.boolean('Automatic Tax Lines'),
     }
 
     def unlink(self, cr, uid, ids, context=None):
@@ -48,8 +48,7 @@ class account_move(osv.osv):
         :param ids: List of account_move IDs
         :param context: context arguments, like lang, time zone
         """
-        if context is None:
-            context = {}
+        context = context or dict()
         for thismove in self.browse(cr, uid, ids, context):
             if 'delete_none' in context:
                 if context['delete_none'] is True:
@@ -60,10 +59,9 @@ class account_move(osv.osv):
 
     def financeinterface_test_move(self, cr, uid, move, context=None):
         """ Test if the move account counterparts are set correct """
-        if context is None:
-            context = {}
+        context = context or dict()
         res = ''
-        checkdict = {}
+        checkdict = dict()
         for line in self.pool.get('account.move').browse(cr, uid, move, context=context)['line_id']:
             if line.account_id and line.ecofi_account_counterpart:
                 if line.account_id.id != line.ecofi_account_counterpart.id:
@@ -89,8 +87,7 @@ class account_move(osv.osv):
 
     def finance_interface_checks(self, cr, uid, ids, context=None):
         """Hook Method for different checks wich is called if the moves post method is called """
-        if context is None:
-            context = {}
+        context = context or dict()
         for move in self.browse(cr, uid, ids, context=context):
             thiserror = ''
             if move.ecofi_manual is False:
@@ -106,6 +103,7 @@ class account_move(osv.osv):
 
     def button_cancel(self, cr, uid, ids, context=None):
         """Check if the move has already been exported"""
+        context = context or dict()
         res = super(account_move, self).button_cancel(cr, uid, ids, context=context)
         for move in self.browse(cr, uid, ids, context=context):
             if move.vorlauf_id:
@@ -121,28 +119,35 @@ class account_move(osv.osv):
 
         :param ids: List of Move Ids
         """
+        context = context or dict()
         for move in self.browse(cr, uid, ids, context=context):
             if move.ecofi_autotax:
                 for line in move.line_id:
                     if self.pool.get('ecofi').is_taxline(cr, line.account_id.id) and not line.ecofi_move_line_autotax:
                         raise osv.except_osv(_('Error!'), _('You can not create tax lines in an auto tax move.'))
                     self.pool.get('account.move.line').create_update_taxline(cr, uid, [line.id], context=context)
-        if context is None:
-            context = {}
         res = super(account_move, self).post(cr, uid, ids, context=context)
         self.finance_interface_checks(cr, uid, ids, context)
         return res
-account_move()
 
 
 class account_move_line(osv.osv):
     """Inherits the account.move.line class and adds attributes
     """
 
+    _inherit = 'account.move.line'
+    _columns = {
+        'ecofi_taxid': fields.many2one('account.tax', 'Move Tax'),
+        'ecofi_brutto_credit': fields.float('Amount Credit Brutto', digits_compute=dp.get_precision('Account')),
+        'ecofi_brutto_debit': fields.float('Amount Debit Brutto', digits_compute=dp.get_precision('Account')),
+        'ecofi_account_counterpart': fields.many2one('account.account', 'Account Counterpart', ondelete='restrict', select=2),
+        'ecofi_move_line_autotax': fields.many2one('account.move.line', 'Move Counterpart', ondelete='cascade', select=2),
+        'ecofi_manual': fields.related('move_id', 'ecofi_manual', type='boolean', string="Manual", store=True),
+    }
+
     def name_get(self, cr, uid, ids, context=None):
-        if context is None:
-            context = {}
-        if 'counterpart_name' in context and context['counterpart_name']:
+        context = context or dict()
+        if context.get('counterpart_name', False):
             if not ids:
                 return []
             result = []
@@ -155,36 +160,24 @@ class account_move_line(osv.osv):
         else:
             return super(account_move_line, self).name_get(cr, uid, ids, context=context)
 
-    _inherit = "account.move.line"
-    _columns = {
-                'ecofi_taxid': fields.many2one('account.tax', 'Move Tax'),
-                'ecofi_brutto_credit': fields.float('Amount Credit Brutto', digits_compute=dp.get_precision('Account')),
-                'ecofi_brutto_debit': fields.float('Amount Debit Brutto', digits_compute=dp.get_precision('Account')),
-                'ecofi_account_counterpart': fields.many2one('account.account', 'Account Counterpart', ondelete='restrict', select=2),
-                'ecofi_move_line_autotax': fields.many2one('account.move.line', 'Move Counterpart', ondelete='cascade', select=2),
-                'ecofi_manual': fields.related('move_id', 'ecofi_manual', type='boolean', string="Manual", store=True),
-    }
-
     def delete_autotaxline(self, cr, uid, move_lineids, context=None):
         """ Method that deletes the corresponding auto generated tax moves"""
-        if context is None:
-            context = {}
+        context = context or dict()
         for move_line in self.browse(cr, uid, move_lineids, context=context):
             move_line_main = self.browse(cr, uid, move_line.ecofi_move_line_autotax.id, context=context)
             update = {
-                        'debit': move_line_main.ecofi_brutto_debit,
-                        'credit': move_line_main.ecofi_brutto_credit,
-                        'tax_code_id': False,
-                        'tax_amount': 0.00,
-                      }
+                'debit': move_line_main.ecofi_brutto_debit,
+                'credit': move_line_main.ecofi_brutto_credit,
+                'tax_code_id': False,
+                'tax_amount': 0.00,
+            }
             self.pool.get('account.move.line').unlink(cr, uid, [move_line.id], context=context)
             self.write(cr, uid, [move_line_main.id], update, context=context)
         return True
 
     def create_update_taxline(self, cr, uid, ids, context=None):
-        "Method to create Tax Lines in manual Mode"
-        if context is None:
-            context = {}
+        """ Method to create Tax Lines in manual Mode """
+        context = context or dict()
         tax_obj = self.pool.get('account.tax')
         for move_line in self.pool.get('account.move.line').browse(cr, uid, ids, context=context):
             if move_line.ecofi_move_line_autotax:
@@ -206,8 +199,8 @@ class account_move_line(osv.osv):
                     base_sign = 'base_sign'
                     tax_sign = 'tax_sign'
                 all_taxes = {
-                        'debit': 0,
-                        'credit': 0,
+                    'debit': 0,
+                    'credit': 0,
                 }
                 tmp_cnt = 0
                 real_tax_code_id = False
@@ -237,10 +230,10 @@ class account_move_line(osv.osv):
                     all_taxes['debit'] += data['debit']
                     all_taxes['credit'] += data['credit']
                 if all_taxes['debit'] >= all_taxes['credit']:
-                    all_taxes['debit'] = all_taxes['debit'] - all_taxes['credit']
+                    all_taxes['debit'] -= all_taxes['credit']
                     all_taxes['credit'] = 0
                 else:
-                    all_taxes['credit'] = all_taxes['credit'] - all_taxes['debit']
+                    all_taxes['credit'] -= all_taxes['debit']
                     all_taxes['debit'] = 0
                 actual_move = self.browse(cr, uid, move_line.id, context=context)
                 write_dict = {
@@ -252,7 +245,6 @@ class account_move_line(osv.osv):
                     'tax_amount': real_tax_amount
                 }
                 self.write(cr, uid, [move_line.id], write_dict, context=context)
-account_move_line()
 
 
 class account_invoice(osv.osv):
@@ -260,7 +252,7 @@ class account_invoice(osv.osv):
     """
     _inherit = 'account.invoice'
     _columns = {
-                'ecofi_buchungstext': fields.char('Export Voucher Text', size=30),
+        'ecofi_buchungstext': fields.char('Export Voucher Text', size=30),
     }
 
     def action_move_create(self, cr, uid, ids, context=None):
@@ -270,15 +262,14 @@ class account_invoice(osv.osv):
         :param uid: the current user’s ID for security checks,
         :param ids: List of account_move IDs
         """
-        if context is None:
-            context = {}
+        context = context or dict()
         context['invoice_ids'] = ids
         thisreturn = super(account_invoice, self).action_move_create(cr, uid, ids, context=context)
         if thisreturn:
             invoice = self.browse(cr, uid, ids)[0]
             self.pool.get('account.move').write(cr, uid, [invoice.move_id.id], {
-                               'ecofi_buchungstext': invoice.ecofi_buchungstext or False,
-                                })
+                'ecofi_buchungstext': invoice.ecofi_buchungstext or False,
+            })
         return thisreturn
 
     def inv_line_characteristic_hashcode(self, invoice, invoice_line):
@@ -299,8 +290,6 @@ class account_invoice(osv.osv):
                 res['ecofi_taxid'] = tax.id
         return res
 
-account_invoice()
-
 
 class account_invoice_line(osv.osv):
     """ Inherits the account.invoice.line class and adds methods and attributes
@@ -310,6 +299,7 @@ class account_invoice_line(osv.osv):
     def create(self, cr, uid, vals, context=None):
         """Prevent that a user places two different taxes in an invoice line
         """
+        context = context or dict()
         if vals.get('invoice_line_tax_id', False):
             if len(vals['invoice_line_tax_id'][0][2]) > 1:
                 raise osv.except_osv(_("Error"), _("""There can only be one tax per invoice line"""))
@@ -319,11 +309,11 @@ class account_invoice_line(osv.osv):
     def write(self, cr, uid, ids, vals, context=None):
         """Prevent that a user places two different taxes in an invoice line
         """
+        context = context or dict()
         if vals.get('invoice_line_tax_id', False):
             if len(vals['invoice_line_tax_id'][0][2]) > 1:
                 raise osv.except_osv(_("Error"), _("""There can only be one tax per invoice line"""))
         return super(account_invoice_line, self).write(cr, uid, ids, vals, context=context)
-account_invoice_line()
 
 
 class account_tax(osv.osv):
@@ -331,10 +321,10 @@ class account_tax(osv.osv):
     """
     _inherit = 'account.tax'
     _columns = {
-                'buchungsschluessel': fields.integer('Posting key', required=True),
+        'buchungsschluessel': fields.integer('Posting key', required=True),
     }
     _defaults = {
-                 'buchungsschluessel': lambda * a: -1,
+        'buchungsschluessel': lambda *a: -1,
     }
 
     def compute_all_inv(self, cr, uid, taxes, price_unit, quantity, product=None, partner=None, force_excluded=False):
@@ -383,4 +373,3 @@ class account_tax(osv.osv):
             'total_included': totalin,
             'taxes': tin + tex
         }
-account_tax()

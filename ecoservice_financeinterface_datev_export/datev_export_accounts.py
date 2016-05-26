@@ -30,8 +30,9 @@ from mako.template import Template as MakoTemplate
 class ecofi_datev_formate(osv.osv):
     _inherit = 'ecofi.datev.formate'
 
-    def _get_export_type(self, cr, uid, context={}):
+    def _get_export_type(self, cr, uid, context=None):
         """Method that can be used by other Modules to add their interface to the selection of possible export formats"""
+        context = context or dict()
         res = super(ecofi_datev_formate, self)._get_export_type(cr, uid, context=context)
         res.append(('pktr', _('Accounts')))
         return res
@@ -40,8 +41,9 @@ class ecofi_datev_formate(osv.osv):
         'datev_type': fields.selection(_get_export_type, 'Exporttype'),
     }
 
-    def get_partner(self, cr, uid, account_id, context={}):
+    def get_partner(self, cr, uid, account_id, context=None):
         """ GET Partner Objects for the corresponding account_id"""
+        context = context or dict()
         thissql = """SELECT id from res_partner where id in
                         (SELECT split_part(res_id, ',', 2)::integer from ir_property
                         WHERE res_id like 'res.partner%' and value_reference = 'account.account,""" + str(account_id) + """')
@@ -68,8 +70,7 @@ class ecofi_datev_formate(osv.osv):
 
     def getfields_defaults(self, cr, thisimport, context=None):
         """Return the Defaults MakeHelp and CSV Template File"""
-        if context is None:
-            context = {}
+        context = context or dict()
         res = super(ecofi_datev_formate, self).getfields_defaults(cr, thisimport, context=context)
         if thisimport.datev_type == 'pktr':
             res['module'] = 'ecoservice_financeinterface_datev_export'
@@ -83,8 +84,7 @@ class ecofi_datev_formate(osv.osv):
 
     def generate_export_csv(self, cr, uid, export, ecofi_csv, context=None):
         """Funktion that fills the CSV Export"""
-        if context is None:
-            context = {}
+        context = context or dict()
         res = super(ecofi_datev_formate, self).generate_export_csv(cr, uid, export, ecofi_csv, context=context)
         if export.datev_type == 'pktr':
             try:
@@ -122,4 +122,3 @@ class ecofi_datev_formate(osv.osv):
                     ecofi_csv.writerow(thisline)
             res['log'] += log
         return res
-ecofi_datev_formate()

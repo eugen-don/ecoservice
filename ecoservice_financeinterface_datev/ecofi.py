@@ -28,6 +28,7 @@ from openerp.tools.translate import _
 from openerp.tools import ustr
 from openerp import workflow
 import logging
+
 _logger = logging.getLogger(__name__)
 
 
@@ -52,8 +53,8 @@ class ecofi(osv.osv):
             _logger.info(_("Migrate Move %s / %s") % (counter, len(invoice_ids)))
             if invoice.move_id:
                 self.pool.get('account.move').write(cr, uid, [invoice.move_id.id], {
-                                   'ecofi_buchungstext': invoice.ecofi_buchungstext or False,
-                                })
+                    'ecofi_buchungstext': invoice.ecofi_buchungstext or False,
+                })
                 move = self.pool.get('account.move').browse(cr, uid, invoice.move_id.id)
                 for invoice_line in invoice.invoice_line:
                     if invoice_line.invoice_line_tax_id:
@@ -61,7 +62,7 @@ class ecofi(osv.osv):
                             if move_line.account_id.id == invoice_line.account_id.id:
                                 if move_line.debit + move_line.credit == abs(invoice_line.price_subtotal):
                                     self.pool.get('account.move.line').write(cr, uid, [move_line.id],
-                                                            {'ecofi_taxid': invoice_line.invoice_line_tax_id[0].id})
+                                                                             {'ecofi_taxid': invoice_line.invoice_line_tax_id[0].id})
         _logger.info(_("Move Migration Finished"))
         return True
 
@@ -99,7 +100,7 @@ class ecofi(osv.osv):
                 thislog = thislog + thismovename + _("Error: No sales tax identification number stored in the partner!\n")
         return (errorcount, partnererror, thislog, thismovename, datevdict)
 
-    def format_umsatz(self, cr, uid, lineumsatz, context={}):
+    def format_umsatz(self, cr, uid, lineumsatz, context=None):
         """ Returns the formatted amount
         :param cr: the current row, from the database cursor
         :param uid: the current user’s ID for security checks
@@ -108,6 +109,7 @@ class ecofi(osv.osv):
         :param lineumsatz:
         :param context:
         """
+        context = context or dict()
         Umsatz = ''
         Sollhaben = ''
         if lineumsatz < 0:
@@ -121,13 +123,14 @@ class ecofi(osv.osv):
             Sollhaben = 's'
         return Umsatz, Sollhaben
 
-    def format_waehrung(self, cr, uid, line, context={}):
+    def format_waehrung(self, cr, uid, line, context=None):
         """ Formats the currency for the export
         :param cr: the current row, from the database cursor
         :param uid: the current user’s ID for security checks
         :param line: account_move_line
         :param context: context arguments, like lang, time zone
         """
+        context = context or dict()
         user = self.pool.get('res.users').browse(cr, uid, uid, context=context)
         Waehrung = False
         if user.company_id:
@@ -147,87 +150,88 @@ class ecofi(osv.osv):
                 Faktor = ''
         return Waehrung, Faktor
 
-    def generate_csv(self, cr, uid, ecofi_csv, bookingdict, log, context={}):
+    def generate_csv(self, cr, uid, ecofi_csv, bookingdict, log, context=None):
         """ Implements the generate_csv method for the datev interface
         """
-        if context.has_key('export_interface'):
-            if context['export_interface'] == 'datev':
-                ecofi_csv.writerow(bookingdict['buchungsheader'])
-                for buchungsatz in bookingdict['buchungen']:
-                    ecofi_csv.writerow(buchungsatz)
+        context = context or dict()
+        if context.get('export_interface', '') == 'datev':
+            ecofi_csv.writerow(bookingdict['buchungsheader'])
+            for buchungsatz in bookingdict['buchungen']:
+                ecofi_csv.writerow(buchungsatz)
         (ecofi_csv, log) = super(ecofi, self).generate_csv(cr, uid, ecofi_csv, bookingdict, log, context=context)
-        return ecofi_csv, log    
-        
+        return ecofi_csv, log
+
     def generate_csv_move_lines(self, cr, uid, move, buchungserror, errorcount, thislog, thismovename, exportmethod,
-                          partnererror, buchungszeilencount, bookingdict, context={}):
+                                partnererror, buchungszeilencount, bookingdict, context=None):
         """ Implements the generate_csv_move_lines method for the datev interface     
         """
-        if context.has_key('export_interface'):
-            if context['export_interface'] == 'datev':
-                if bookingdict.has_key('buchungen') is False:
-                    bookingdict['buchungen'] = []
-                if bookingdict.has_key('buchungsheader') is False:
-                    bookingdict['buchungsheader'] = self.buchungenHeaderDatev()    
-                faelligkeit = False  
-                for line in move.line_id:
-                    if line.debit == 0 and line.credit==0:
+        context = context or dict()
+        if context.get('export_interface', '') == 'datev':
+            if not bookingdict.get('buchungen', False):
+                bookingdict['buchungen'] = []
+            if not bookingdict.get('buchungsheader', False):
+                bookingdict['buchungsheader'] = self.buchungenHeaderDatev()
+            faelligkeit = False
+            for line in move.line_id:
+                if line.debit == 0 and line.credit == 0:
+                    continue
+                datevkonto = line.ecofi_account_counterpart.code
+                datevgegenkonto = ustr(line.account_id.code)
+                if datevgegenkonto == datevkonto:
+                    if line.date_maturity:
+                        faelligkeit = '%s%s%s' % (line.date[8:10], line.date[5:7], line.date[2:4])
+                    continue
+                lineumsatz = Decimal(str(0))
+                lineumsatz += Decimal(str(line.debit))
+                lineumsatz -= Decimal(str(line.credit))
+                if line.amount_currency != 0:
+                    lineumsatz = Decimal(str(line.amount_currency))
+                    context['waehrung'] = True
+                buschluessel = ''
+                if exportmethod == 'brutto':
+                    if self.pool.get('ecofi').is_taxline(cr, line.account_id.id) and not line.ecofi_bu == 'SD':
                         continue
-                    datevkonto = line.ecofi_account_counterpart.code
-                    datevgegenkonto = ustr(line.account_id.code)
-                    if datevgegenkonto == datevkonto:
-                        if line.date_maturity:
-                            faelligkeit = '%s%s%s' % (line.date[8:10], line.date[5:7], line.date[2:4])
-                        continue
-                    lineumsatz = Decimal(str(0))
-                    lineumsatz += Decimal(str(line.debit))
-                    lineumsatz -= Decimal(str(line.credit))
-                    if line.amount_currency != 0:
-                        lineumsatz = Decimal(str(line.amount_currency))
-                        context['waehrung'] = True
-                    buschluessel = ''  
-                    if exportmethod == 'brutto':
-                        if self.pool.get('ecofi').is_taxline(cr, line.account_id.id) and not line.ecofi_bu == 'SD':
-                            continue
-                        if line.ecofi_bu and line.ecofi_bu == '40':
-                            buschluessel = '40'
-                        else:
-                            taxamount = self.pool.get('ecofi').calculate_tax(cr, uid, line, context)
-                            lineumsatz = lineumsatz + Decimal(str(taxamount))
-                            linetax = self.get_line_tax(cr, uid, line)
-                            if line.account_id.automatic is False and linetax:
-                                buschluessel = str(linetax.buchungsschluessel) # pylint: disable-msg=E1103
-                    umsatz, sollhaben = self.format_umsatz(cr, uid, lineumsatz, context=context)           
-                    datevdict = {'Sollhaben': sollhaben, 
-                                 'Umsatz': umsatz, 
-                                 'Gegenkonto': datevgegenkonto, 
-                                 'Datum':'',
-                                 'Konto': datevkonto or '', 
-                                 'Beleg1':'', 
-                                 'Beleg2':'',
-                                 'Waehrung':'', 
-                                 'Buschluessel': buschluessel,
-                                 'Kost1':'',
-                                 'Kost2':'', 
-                                 'Kostmenge':'', 
-                                 'Skonto':'', 
-                                 'Buchungstext':'',
-                                 'EulandUSTID':'', 
-                                 'EUSteuer':'', 
-                                 'Basiswaehrungsbetrag':'',
-                                 'Basiswaehrungskennung':'', 
-                                 'Kurs':'', 
-                                 'Movename': ustr(move.name)
-                                 }
-                    (errorcount, partnererror, thislog, thismovename, datevdict) = self.field_config(cr,
-                                                                    uid, move, line, errorcount, partnererror, thislog, 
-                                                                    thismovename, faelligkeit, datevdict)
-                    bookingdict['buchungen'].append(self.buchungenCreateDatev(datevdict))
-                    buchungszeilencount += 1
+                    if line.ecofi_bu and line.ecofi_bu == '40':
+                        buschluessel = '40'
+                    else:
+                        taxamount = self.pool.get('ecofi').calculate_tax(cr, uid, line, context)
+                        lineumsatz = lineumsatz + Decimal(str(taxamount))
+                        linetax = self.get_line_tax(cr, uid, line)
+                        if line.account_id.automatic is False and linetax:
+                            buschluessel = str(linetax.buchungsschluessel)  # pylint: disable-msg=E1103
+                umsatz, sollhaben = self.format_umsatz(cr, uid, lineumsatz, context=context)
+                datevdict = {'Sollhaben': sollhaben,
+                             'Umsatz': umsatz,
+                             'Gegenkonto': datevgegenkonto,
+                             'Datum': '',
+                             'Konto': datevkonto or '',
+                             'Beleg1': '',
+                             'Beleg2': '',
+                             'Waehrung': '',
+                             'Buschluessel': buschluessel,
+                             'Kost1': '',
+                             'Kost2': '',
+                             'Kostmenge': '',
+                             'Skonto': '',
+                             'Buchungstext': '',
+                             'EulandUSTID': '',
+                             'EUSteuer': '',
+                             'Basiswaehrungsbetrag': '',
+                             'Basiswaehrungskennung': '',
+                             'Kurs': '',
+                             'Movename': ustr(move.name)
+                             }
+                (errorcount, partnererror, thislog, thismovename, datevdict) = self.field_config(cr,
+                                                                                                 uid, move, line, errorcount, partnererror, thislog,
+                                                                                                 thismovename, faelligkeit, datevdict)
+                bookingdict['buchungen'].append(self.buchungenCreateDatev(datevdict))
+                buchungszeilencount += 1
         buchungserror, errorcount, thislog, partnererror, buchungszeilencount, bookingdict = super(ecofi, self).generate_csv_move_lines(cr,
-            uid, move, buchungserror, errorcount, thislog, thismovename, exportmethod, partnererror, buchungszeilencount, bookingdict, 
-            context=context)
+                                                                                                                                        uid, move, buchungserror, errorcount, thislog, thismovename, exportmethod, partnererror, buchungszeilencount,
+                                                                                                                                        bookingdict,
+                                                                                                                                        context=context)
         return buchungserror, errorcount, thislog, partnererror, buchungszeilencount, bookingdict
-   
+
     def buchungenHeaderDatev(self):
         """ Method that creates the Datev CSV Headerlione
         """
@@ -252,19 +256,19 @@ class ecofi(osv.osv):
         buchung.append(ustr("Basiswährungskennung").encode("iso-8859-1"))
         buchung.append(ustr("Kurs").encode("iso-8859-1"))
         return buchung
-            
+
     def buchungenCreateDatev(self, datevdict):
         """Method that creates the datev csv moveline
         """
-        buchung = []                     
+        buchung = []
         buchung.append(datevdict['Waehrung'].encode("iso-8859-1"))
         buchung.append(datevdict['Sollhaben'].encode("iso-8859-1"))
         buchung.append(datevdict['Umsatz'].encode("iso-8859-1"))
         if datevdict['Buschluessel'] == '0':
-            datevdict['Buschluessel'] = ''            
+            datevdict['Buschluessel'] = ''
         buchung.append(datevdict['Buschluessel'].encode("iso-8859-1"))
         buchung.append(datevdict['Gegenkonto'].encode("iso-8859-1"))
-        buchung.append(datevdict['Beleg1'].encode("iso-8859-1"))          
+        buchung.append(datevdict['Beleg1'].encode("iso-8859-1"))
         buchung.append(datevdict['Beleg2'].encode("iso-8859-1"))
         buchung.append(datevdict['Datum'].encode("iso-8859-1"))
         buchung.append(datevdict['Konto'].encode("iso-8859-1"))
@@ -280,5 +284,3 @@ class ecofi(osv.osv):
         buchung.append(datevdict['Basiswaehrungskennung'].encode("iso-8859-1"))
         buchung.append(datevdict['Kurs'].encode("iso-8859-1"))
         return buchung
-    
-ecofi()

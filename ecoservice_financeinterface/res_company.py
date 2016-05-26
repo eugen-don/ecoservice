@@ -26,26 +26,26 @@
 from osv import osv
 from osv import fields
 
+
 class res_company(osv.osv):
     """ Inherits the res.company class and adds methods and attributes
     
     .. automethod:: _finance_interface_selection
     """
-    _inherit = "res.company"
-    
-    def _finance_interface_selection(self, cr, uid, context={}):
+    _inherit = 'res.company'
+
+    def _finance_interface_selection(self, cr, uid, context=None):
         """Method that can be used by other Modules to add their interface to the selection of possible export formats 
         the stored value will be used as context variable export_interface
         
         .. seealso:: 
             :class:`ecoservice_financeinterface.ecofi.ecofi.ecofi_buchungen`
         """
-        return [('none','None')]
-    
+        return [('none', 'None')]
+
     _columns = {
-                'finance_interface': fields.selection(_finance_interface_selection, 'Finance Interface'),
-                'journal_ids': fields.many2many('account.journal', 'res_company_account_journal',
-                                                        'res_company_id', 'account_journal_id', 'Journal', 
-                                                        domain="[('company_id', '=', active_id)]"),
+        'finance_interface': fields.selection(_finance_interface_selection, 'Finance Interface'),
+        'journal_ids': fields.many2many('account.journal', 'res_company_account_journal',
+                                        'res_company_id', 'account_journal_id', 'Journal',
+                                        domain="[('company_id', '=', active_id)]"),
     }
-res_company()

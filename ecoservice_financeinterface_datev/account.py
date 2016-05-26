@@ -27,18 +27,14 @@ from decimal import Decimal
 
 
 class account_account(osv.osv):
-    _inherit = "account.account"
+    _inherit = 'account.account'
 
     _columns = {
-        'ustuebergabe': fields.boolean('Datev UST-ID', help=_("""Is required when transferring
-                a sales tax identification number  from the account partner (e.g. EU-Invoice)""")),
+        'ustuebergabe': fields.boolean('Datev UST-ID', help="""Is required when transferring
+                a sales tax identification number  from the account partner (e.g. EU-Invoice)"""),
         'automatic': fields.boolean('Datev Automatikkonto'),
         'datev_steuer': fields.many2one('account.tax', 'Datev Steuerkonto', domain=[('buchungsschluessel', '!=', -1)]),
         'datev_steuer_erforderlich': fields.boolean('Steuerbuchung erforderlich?'),
-    }
-
-    _defaults = {
-        'ustuebergabe': lambda *a: False,
     }
 
     def cron_update_line_autoaccounts_tax(self, cr, uid):
@@ -53,9 +49,6 @@ class account_account(osv.osv):
                 self.pool.get('account.move.line').write(cr, uid, move_line_ids, {'ecofi_taxid': account['datev_steuer']})
 
 
-account_account()
-
-
 class account_tax(osv.osv):
     _inherit = 'account.tax'
 
@@ -64,24 +57,19 @@ class account_tax(osv.osv):
     }
 
 
-account_tax()
-
-
 class account_payment_term(osv.osv):
-    _inherit = "account.payment.term"
+    _inherit = 'account.payment.term'
 
     _columns = {
         'zahlsl': fields.integer('Payment key'),
     }
 
 
-account_payment_term()
-
-
 class account_move(osv.osv):
-    _inherit = "account.move"
+    _inherit = 'account.move'
 
-    def datev_account_checks(self, cr, uid, move, context={}):
+    def datev_account_checks(self, cr, uid, move, context=None):
+        context = context or dict()
         error = ''
         linecount = 0
         self.update_line_autoaccounts_tax(cr, uid, move, context=context)
@@ -109,7 +97,8 @@ class account_move(osv.osv):
                         error += _(ustr("""The bookingkey for the tax %s is not configured!\n""")) % (linetax.name)  # pylint: disable-msg=E1103,C0301
         return error
 
-    def update_line_autoaccounts_tax(self, cr, uid, move, context={}):
+    def update_line_autoaccounts_tax(self, cr, uid, move, context=None):
+        context = context or dict()
         error = ''
         linecount = 0
         for line in move.line_id:
@@ -124,7 +113,8 @@ class account_move(osv.osv):
                             error += _("""The Account is an Autoaccount, although the moveline %s has no tax!\n""") % (linecount)
         return error
 
-    def datev_tax_check(self, cr, uid, move, context={}):
+    def datev_tax_check(self, cr, uid, move, context=None):
+        context = context or dict()
         error = ''
         linecount = 0
         tax_values = {}
@@ -166,7 +156,7 @@ class account_move(osv.osv):
 
         return error
 
-    def datev_checks(self, cr, uid, move, context={}):
+    def datev_checks(self, cr, uid, move, context=None):
         """
         Constraintcheck if export method is 'brutto'
 
@@ -176,31 +166,26 @@ class account_move(osv.osv):
         :param ecofikonto: main account of the move
         :param context: context arguments, like lang, time zone
         """
+        context = context or dict()
         error = ''
         error += self.update_line_autoaccounts_tax(cr, uid, move, context=context)
         error += self.datev_account_checks(cr, uid, move, context=context)
-        if error == '':
+        if not error:
             error += self.datev_tax_check(cr, uid, move, context=context)
-        if error == '':
-            return False
-        return error
+        return error or False
 
     def finance_interface_checks(self, cr, uid, ids, context=None):
-        if context is None:
-            context = {}
+        context = context or dict()
         res = super(account_move, self).finance_interface_checks(cr, uid, ids, context=context)
         for move in self.browse(cr, uid, ids, context=context):
             error = self.datev_checks(cr, uid, move, context)
             if error:
-                raise osv.except_osv('Error', error)
+                raise osv.except_osv('Datev Error', error)
         return res
 
 
-account_move()
-
-
 class account_move_line(osv.osv):
-    _inherit = "account.move.line"
+    _inherit = 'account.move.line'
 
     _columns = {
         'ecofi_bu': fields.selection([
@@ -208,6 +193,3 @@ class account_move_line(osv.osv):
             ('SD', 'Steuer Direkt'),
         ], 'Datev BU', select=True),
     }
-
-
-account_move_line()
