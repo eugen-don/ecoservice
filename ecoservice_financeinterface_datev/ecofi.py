@@ -1,4 +1,4 @@
-# -*- encoding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """ The ecofi module extends the original OpenERP ecofi objects with different attributes and methods
 """
 ##############################################################################

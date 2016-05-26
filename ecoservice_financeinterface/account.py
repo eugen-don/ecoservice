@@ -1,4 +1,4 @@
-# -*- encoding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """ The account module extends the original OpenERP account objects with different attributes and methods
 """
 ##############################################################################

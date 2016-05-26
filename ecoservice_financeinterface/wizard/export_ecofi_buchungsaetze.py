@@ -1,4 +1,4 @@
-# -*- encoding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """ The export_ecofi_buchungsaetze module provides the wizard object the user calls when exporting
 """
 ##############################################################################

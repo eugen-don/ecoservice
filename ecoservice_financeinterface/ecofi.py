@@ -1,4 +1,4 @@
-# -*- encoding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """ The ecofi module provides the basic objects to export account moves as csv data
 """
 ##############################################################################

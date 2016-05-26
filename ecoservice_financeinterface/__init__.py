@@ -1,4 +1,4 @@
-# -*- encoding: utf-8 -*- # pylint: disable-msg=C0111
+# -*- coding: utf-8 -*-
 ##############################################################################
 #    ecoservice_financeinterface
 #    Copyright (c) 2013 ecoservice GbR (<http://www.ecoservice.de>).
@@ -20,7 +20,8 @@
 #    OpenERP, Open Source Management Solution
 #    Copyright (C) 2004-2010 Tiny SPRL (<http://tiny.be>).
 ##############################################################################
-import ecofi
-import account
-import wizard
-import res_company
+
+from . import ecofi
+from . import account
+from . import wizard
+from . import res_company

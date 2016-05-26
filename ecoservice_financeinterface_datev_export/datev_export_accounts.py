@@ -1,4 +1,4 @@
-# -*- encoding: utf-8 -*- # pylint: disable-msg=C0302
+# -*- coding: utf-8 -*-
 ##############################################################################
 #    ecoservice_financeinterface_datev_export
 #    Copyright (c) 2013 ecoservice GbR (<http://www.ecoservice.de>).

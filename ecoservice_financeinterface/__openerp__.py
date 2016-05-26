@@ -1,4 +1,4 @@
-# -*- encoding: utf-8 -*- # pylint: disable-msg=C0111
+# -*- coding: utf-8 -*-
 ##############################################################################
 #    ecoservice_financeinterface
 #    Copyright (c) 2013 ecoservice GbR (<http://www.ecoservice.de>).
@@ -20,33 +20,36 @@
 #    OpenERP, Open Source Management Solution
 #    Copyright (C) 2004-2010 Tiny SPRL (<http://tiny.be>).
 ##############################################################################
-{  # pylint: disable-msg=W0104
-    "name": "Ecoservice Financial Interface",
-    "version": "1.0",
-    "depends": ["base", "account"],
-    "author": "ecoservice",
-    "website": "www.ecoservice.de",
-    "description": """The main modul ecoservice_finance provides the basic methods for the finance interface.
+{
+    'name': 'Ecoservice Financial Interface',
+    'version': '7.0.1.1',
+    'depends': [
+        'base',
+        'account'
+    ],
+    'author': 'ecoservice',
+    'website': 'https://www.ecoservice.de',
+    'description': """The main modul ecoservice_finance provides the basic methods for the finance interface.
 
 Further information under
-* Launchpad https://launchpad.net/ecoservice-openerp-addons
-* Ecoservice Website http://www.ecoservice.de
+* Github https://github.com/ecoservice/ecoservice
+* Ecoservice Website https://www.ecoservice.de
 
 """,
-    "category": "Accounting",
-    "init_xml": [],
-    "update_xml": [
-                    'security/ecofi_security.xml',
-                    'security/ir.model.access.csv',
-                    'account_view.xml',
-                    'account_invoice_view.xml',
-                    'ecofi_sequence.xml',
-                    'ecofi_view.xml',
-                    'res_company_view.xml',
-                    'wizard/wizard_view.xml'
-                    ],
-    "demo_xml": [],
-    "test": [],
-    "active": False,
-    "installable": True
+    'category': 'Accounting',
+    'data': [
+        'security/ecofi_security.xml',
+        'security/ir.model.access.csv',
+        'account_view.xml',
+        'account_invoice_view.xml',
+        'ecofi_sequence.xml',
+        'ecofi_view.xml',
+        'res_company_view.xml',
+        'wizard/wizard_view.xml'
+    ],
+    'demo': [],
+    'test': [],
+    'application': True,
+    'active': False,
+    'installable': True
 }

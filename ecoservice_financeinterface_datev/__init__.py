@@ -1,4 +1,4 @@
-# -*- encoding: utf-8 -*- # pylint: disable-msg=C0111
+# -*- coding: utf-8 -*-
 ##############################################################################
 #    ecoservice_financeinterface_datev
 #    Copyright (c) 2013 ecoservice GbR (<http://www.ecoservice.de>).
@@ -20,7 +20,8 @@
 #    OpenERP, Open Source Management Solution
 #    Copyright (C) 2004-2010 Tiny SPRL (<http://tiny.be>).
 ##############################################################################
-import account
-import res_company
-import ecofi
-import ecoservice_financeinterface_datev_installer
+
+from . import account
+from . import res_company
+from . import ecofi
+from . import ecoservice_financeinterface_datev_installer

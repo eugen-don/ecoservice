@@ -1,4 +1,4 @@
-# -*- encoding: utf-8 -*- # pylint: disable-msg=C0111
+# -*- coding: utf-8 -*-
 ##############################################################################
 #    ecoservice_financeinterface_datev
 #    Copyright (c) 2013 ecoservice GbR (<http://www.ecoservice.de>).
@@ -20,32 +20,35 @@
 #    OpenERP, Open Source Management Solution
 #    Copyright (C) 2004-2010 Tiny SPRL (<http://tiny.be>).
 ##############################################################################
-{# pylint: disable-msg=W0104
-    "name" : "Ecoservice Financial Interface Datev",
-    "version" : "1.0",
-    "depends" : ["ecoservice_financeinterface", "mail"],
-    "author" : "ecoservice",
-    "website" : "www.ecoservice.de",
-    "description": """The module ecoservice_financeinterface_datev provides methods to convert account moves to the Datevformat (Datev Dok.-Nr.: 1036228).
+{
+    'name': 'Ecoservice Financial Interface Datev',
+    'version': '7.0.1.1',
+    'depends': [
+        'ecoservice_financeinterface',
+        'mail'
+    ],
+    'author': 'ecoservice',
+    'website': 'www.ecoservice.de',
+    'description': """The module ecoservice_financeinterface_datev provides methods to convert account moves to the Datevformat (Datev Dok.-Nr.: 1036228).
 
 Details of the module:
 * Configuration of automatic accounts
 * Test of datev accounting rules
  
-Further information under 
-* Launchpad https://launchpad.net/ecoservice-openerp-addons
-* Ecoservice Website http://www.ecoservice.de
+Further information under
+* Github https://github.com/ecoservice/ecoservice
+* Ecoservice Website https://www.ecoservice.de
 """,
-    "category" : "Accounting",
-    "init_xml" : [],
-    "update_xml" : [
-                    'account_view.xml',
-                    'account_cron.xml',
-                    'res_company_view.xml',
-                    'ecoservice_financeinterface_datev_installer_view.xml'
-                    ],
-    "demo_xml" : [],
+    'category': 'Accounting',
+    'data': [
+        'account_view.xml',
+        'account_cron.xml',
+        'res_company_view.xml',
+        'ecoservice_financeinterface_datev_installer_view.xml'
+    ],
+    'demo': [],
     'test': [],
-    "active": False,
-    "installable": True
+    'active': False,
+    'application': False,
+    'installable': True
 }

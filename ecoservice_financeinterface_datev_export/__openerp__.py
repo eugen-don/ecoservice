@@ -1,4 +1,4 @@
-# -*- encoding: utf-8 -*-
+# -*- coding: utf-8 -*-
 ##############################################################################
 #    ecoservice_financeinterface_datev_export
 #    Copyright (c) 2013 ecoservice GbR (<http://www.ecoservice.de>).
@@ -21,31 +21,31 @@
 #    Copyright (C) 2004-2010 Tiny SPRL (<http://tiny.be>).
 ##############################################################################
 {
-    "name" : "Ecoservice Financial Interface Datev Exports",
-    "version" : "1.0",
-    "depends" : ["ecoservice_financeinterface"],
-    "author" : "ecoservice",
-    "website" : "www.ecoservice.de",
-    "description": """The module ecoservice_financeinterface_datev_export lets you configure different ascii base data exports.
+    'name': 'Ecoservice Financial Interface Datev Exports',
+    'version': '7.0.1.1',
+    'depends': ['ecoservice_financeinterface'],
+    'author': 'ecoservice',
+    'website': 'https://www.ecoservice.de',
+    'description': """The module ecoservice_financeinterface_datev_export lets you configure different ascii base data exports.
 
 Details of the module:
 * Export of Paymentterms
 * Export of Debit and Credit Account
 
 Further information under
-* Launchpad https://launchpad.net/ecoservice-openerp-addons
-* Ecoservice Website http://www.ecoservice.de
+* Github https://github.com/ecoservice/ecoservice
+* Ecoservice Website https://www.ecoservice.de
 """,
-    "category" : "Accounting",
-    "init_xml" : [],
-    "update_xml" : [
+    'category': 'Accounting',
+    'data': [
         'datev_export_data.xml',
         'datev_export.xml',
         'wizard/export_ecofi_datev_export.xml',
         'security/ir.model.access.csv',
     ],
-    "demo_xml" : [],
+    'demo': [],
     'test': [],
-    "active": False,
-    "installable": True
+    'active': False,
+    'application': False,
+    'installable': True
 }
