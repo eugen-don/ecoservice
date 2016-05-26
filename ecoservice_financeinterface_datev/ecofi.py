@@ -199,87 +199,84 @@ class ecofi(orm.Model):
                         if line.account_id.automatic is False and linetax:
                             buschluessel = str(linetax.buchungsschluessel)  # pylint: disable-msg=E1103
                 umsatz, sollhaben = self.format_umsatz(cr, uid, lineumsatz, context=context)
-                datevdict = {'Sollhaben': sollhaben,
-                             'Umsatz': umsatz,
-                             'Gegenkonto': datevgegenkonto,
-                             'Datum': '',
-                             'Konto': datevkonto or '',
-                             'Beleg1': '',
-                             'Beleg2': '',
-                             'Waehrung': '',
-                             'Buschluessel': buschluessel,
-                             'Kost1': '',
-                             'Kost2': '',
-                             'Kostmenge': '',
-                             'Skonto': '',
-                             'Buchungstext': '',
-                             'EulandUSTID': '',
-                             'EUSteuer': '',
-                             'Basiswaehrungsbetrag': '',
-                             'Basiswaehrungskennung': '',
-                             'Kurs': '',
-                             'Movename': ustr(move.name)
-                             }
-                (errorcount, partnererror, thislog, thismovename, datevdict) = self.field_config(cr,
-                                                                                                 uid, move, line, errorcount, partnererror, thislog,
-                                                                                                 thismovename, faelligkeit, datevdict)
+                datevdict = {
+                    'Sollhaben': sollhaben,
+                    'Umsatz': umsatz,
+                    'Gegenkonto': datevgegenkonto,
+                    'Datum': '',
+                    'Konto': datevkonto or '',
+                    'Beleg1': '',
+                    'Beleg2': '',
+                    'Waehrung': '',
+                    'Buschluessel': buschluessel,
+                    'Kost1': '',
+                    'Kost2': '',
+                    'Kostmenge': '',
+                    'Skonto': '',
+                    'Buchungstext': '',
+                    'EulandUSTID': '',
+                    'EUSteuer': '',
+                    'Basiswaehrungsbetrag': '',
+                    'Basiswaehrungskennung': '',
+                    'Kurs': '',
+                    'Movename': ustr(move.name)
+                }
+                (errorcount, partnererror, thislog, thismovename, datevdict) = self.field_config(
+                    cr,uid, move, line, errorcount, partnererror, thislog, thismovename, faelligkeit, datevdict)
                 bookingdict['buchungen'].append(self.buchungenCreateDatev(datevdict))
                 buchungszeilencount += 1
-        buchungserror, errorcount, thislog, partnererror, buchungszeilencount, bookingdict = super(ecofi, self).generate_csv_move_lines(cr,
-                                                                                                                                        uid, move, buchungserror, errorcount, thislog, thismovename, exportmethod, partnererror, buchungszeilencount,
-                                                                                                                                        bookingdict,
-                                                                                                                                        context=context)
+        buchungserror, errorcount, thislog, partnererror, buchungszeilencount, bookingdict = super(ecofi, self).generate_csv_move_lines(
+            cr, uid, move, buchungserror, errorcount, thislog, thismovename, exportmethod, partnererror, buchungszeilencount, bookingdict, context=context)
         return buchungserror, errorcount, thislog, partnererror, buchungszeilencount, bookingdict
 
     def buchungenHeaderDatev(self):
         """ Method that creates the Datev CSV Headerlione
         """
-        buchung = []
-        buchung.append(ustr("Währungskennung").encode("iso-8859-1"))
-        buchung.append(ustr("Soll-/Haben-Kennzeichen").encode("iso-8859-1"))
-        buchung.append(ustr("Umsatz (ohne Soll-/Haben-Kennzeichen)").encode("iso-8859-1"))
-        buchung.append(ustr("BU-Schlüssel ").encode("iso-8859-1"))
-        buchung.append(ustr("Gegenkonto (ohne BU-Schlüssel)").encode("iso-8859-1"))
-        buchung.append(ustr("Belegfeld 1").encode("iso-8859-1"))
-        buchung.append(ustr("Belegfeld 2").encode("iso-8859-1"))
-        buchung.append(ustr("Datum").encode("iso-8859-1"))
-        buchung.append(ustr("Konto").encode("iso-8859-1"))
-        buchung.append(ustr("Kostfeld 1").encode("iso-8859-1"))
-        buchung.append(ustr("Kostfeld 2").encode("iso-8859-1"))
-        buchung.append(ustr("Kostmenge").encode("iso-8859-1"))
-        buchung.append(ustr("Skonto").encode("iso-8859-1"))
-        buchung.append(ustr("Buchungstext").encode("iso-8859-1"))
-        buchung.append(ustr("EU-Land und UStID").encode("iso-8859-1"))
-        buchung.append(ustr("EU-Steuersatz").encode("iso-8859-1"))
-        buchung.append(ustr("Basiswährungsbetrag").encode("iso-8859-1"))
-        buchung.append(ustr("Basiswährungskennung").encode("iso-8859-1"))
-        buchung.append(ustr("Kurs").encode("iso-8859-1"))
-        return buchung
+        return [
+            u'Währungskennung'.encode('iso-8859-1'),
+            u'Soll-/Haben-Kennzeichen'.encode('iso-8859-1'),
+            u'Umsatz (ohne Soll-/Haben-Kennzeichen)'.encode('iso-8859-1'),
+            u'BU-Schlüssel '.encode('iso-8859-1'),
+            u'Gegenkonto (ohne BU-Schlüssel)'.encode('iso-8859-1'),
+            u'Belegfeld 1'.encode('iso-8859-1'),
+            u'Belegfeld 2'.encode('iso-8859-1'),
+            u'Datum'.encode('iso-8859-1'),
+            u'Konto'.encode('iso-8859-1'),
+            u'Kostfeld 1'.encode('iso-8859-1'),
+            u'Kostfeld 2'.encode('iso-8859-1'),
+            u'Kostmenge'.encode('iso-8859-1'),
+            u'Skonto'.encode('iso-8859-1'),
+            u'Buchungstext'.encode('iso-8859-1'),
+            u'EU-Land und UStID'.encode('iso-8859-1'),
+            u'EU-Steuersatz'.encode('iso-8859-1'),
+            u'Basiswährungsbetrag'.encode('iso-8859-1'),
+            u'Basiswährungskennung'.encode('iso-8859-1'),
+            u'Kurs'.encode('iso-8859-1')
+        ]
 
     def buchungenCreateDatev(self, datevdict):
         """Method that creates the datev csv moveline
         """
-        buchung = []
-        buchung.append(datevdict['Waehrung'].encode("iso-8859-1"))
-        buchung.append(datevdict['Sollhaben'].encode("iso-8859-1"))
-        buchung.append(datevdict['Umsatz'].encode("iso-8859-1"))
         if datevdict['Buschluessel'] == '0':
             datevdict['Buschluessel'] = ''
-        buchung.append(datevdict['Buschluessel'].encode("iso-8859-1"))
-        buchung.append(datevdict['Gegenkonto'].encode("iso-8859-1"))
-        buchung.append(datevdict['Beleg1'].encode("iso-8859-1"))
-        buchung.append(datevdict['Beleg2'].encode("iso-8859-1"))
-        buchung.append(datevdict['Datum'].encode("iso-8859-1"))
-        buchung.append(datevdict['Konto'].encode("iso-8859-1"))
-        buchung.append(datevdict['Kost1'].encode("iso-8859-1"))
-        buchung.append(datevdict['Kost2'].encode("iso-8859-1"))
-        buchung.append(datevdict['Kostmenge'].encode("iso-8859-1"))
-        buchung.append(datevdict['Skonto'].encode("iso-8859-1"))
-        datevdict['Buchungstext'] = datevdict['Buchungstext'][0:30]
-        buchung.append(datevdict['Buchungstext'].encode("iso-8859-1", 'ignore'))
-        buchung.append(datevdict['EulandUSTID'].encode("iso-8859-1"))
-        buchung.append(datevdict['EUSteuer'].encode("iso-8859-1"))
-        buchung.append(datevdict['Basiswaehrungsbetrag'].encode("iso-8859-1"))
-        buchung.append(datevdict['Basiswaehrungskennung'].encode("iso-8859-1"))
-        buchung.append(datevdict['Kurs'].encode("iso-8859-1"))
-        return buchung
+        return [
+            datevdict['Waehrung'].encode('iso-8859-1'),
+            datevdict['Sollhaben'].encode('iso-8859-1'),
+            datevdict['Umsatz'].encode('iso-8859-1'),
+            datevdict['Buschluessel'].encode('iso-8859-1'),
+            datevdict['Gegenkonto'].encode('iso-8859-1'),
+            datevdict['Beleg1'].encode('iso-8859-1'),
+            datevdict['Beleg2'].encode('iso-8859-1'),
+            datevdict['Datum'].encode('iso-8859-1'),
+            datevdict['Konto'].encode('iso-8859-1'),
+            datevdict['Kost1'].encode('iso-8859-1'),
+            datevdict['Kost2'].encode('iso-8859-1'),
+            datevdict['Kostmenge'].encode('iso-8859-1'),
+            datevdict['Skonto'].encode('iso-8859-1'),
+            datevdict['Buchungstext'][0:30].encode('iso-8859-1', 'ignore'),
+            datevdict['EulandUSTID'].encode('iso-8859-1'),
+            datevdict['EUSteuer'].encode('iso-8859-1'),
+            datevdict['Basiswaehrungsbetrag'].encode('iso-8859-1'),
+            datevdict['Basiswaehrungskennung'].encode('iso-8859-1'),
+            datevdict['Kurs'].encode('iso-8859-1'),
+        ]
