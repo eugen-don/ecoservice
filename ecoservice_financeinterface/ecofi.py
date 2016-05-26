@@ -22,7 +22,7 @@
 #    OpenERP, Open Source Management Solution
 #    Copyright (C) 2004-2010 Tiny SPRL (<http://tiny.be>).
 ##############################################################################
-from openerp.osv import fields, osv
+from openerp.osv import fields, orm
 from openerp.tools.translate import _
 import base64
 import cStringIO
@@ -33,7 +33,7 @@ from datetime import datetime
 import re
 
 
-class ecofi(osv.osv):
+class ecofi(orm.Model):
     """
     The class ecofi is the central object to generate a csv file for the selected moves that
     can be used to be imported in the different financial programms

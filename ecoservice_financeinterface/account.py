@@ -22,14 +22,14 @@
 #    OpenERP, Open Source Management Solution
 #    Copyright (C) 2004-2010 Tiny SPRL (<http://tiny.be>).
 ##############################################################################
-from openerp.osv import fields, osv
+from openerp.osv import fields, orm
 from openerp.tools.translate import _
 from openerp.tools import ustr
 from openerp.tools.float_utils import float_round
 import openerp.addons.decimal_precision as dp
 
 
-class account_move(osv.osv):
+class account_move(orm.Model):
     """ Inherits the account.move class and adds methods and attributes
     """
     _inherit = 'account.move'
@@ -131,7 +131,7 @@ class account_move(osv.osv):
         return res
 
 
-class account_move_line(osv.osv):
+class account_move_line(orm.Model):
     """Inherits the account.move.line class and adds attributes
     """
 
@@ -247,7 +247,7 @@ class account_move_line(osv.osv):
                 self.write(cr, uid, [move_line.id], write_dict, context=context)
 
 
-class account_invoice(osv.osv):
+class account_invoice(orm.Model):
     """ Inherits the account.invoice class and adds methods and attributes
     """
     _inherit = 'account.invoice'
@@ -291,7 +291,7 @@ class account_invoice(osv.osv):
         return res
 
 
-class account_invoice_line(osv.osv):
+class account_invoice_line(orm.Model):
     """ Inherits the account.invoice.line class and adds methods and attributes
     """
     _inherit = 'account.invoice.line'
@@ -316,7 +316,7 @@ class account_invoice_line(osv.osv):
         return super(account_invoice_line, self).write(cr, uid, ids, vals, context=context)
 
 
-class account_tax(osv.osv):
+class account_tax(orm.Model):
     """Inherits the account.tax class and adds attributes
     """
     _inherit = 'account.tax'

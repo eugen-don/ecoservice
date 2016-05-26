@@ -23,10 +23,10 @@
 #    Copyright (C) 2004-2010 Tiny SPRL (<http://tiny.be>).
 ##############################################################################
 import time
-from openerp.osv import osv, fields
+from openerp.osv import orm, fields
 
 
-class export_ecofi(osv.osv_memory):
+class export_ecofi(orm.TransientModel):
     _name = 'export.ecofi'
     _description = 'Financeexport'
     """ OSV Memory object the user calls when exporting

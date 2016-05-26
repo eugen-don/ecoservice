@@ -20,13 +20,13 @@
 #    OpenERP, Open Source Management Solution
 #    Copyright (C) 2004-2010 Tiny SPRL (<http://tiny.be>).
 ##############################################################################
-from openerp.osv import fields, osv
+from openerp.osv import fields, orm
 from openerp.tools.translate import _
 from openerp.tools import ustr
 from decimal import Decimal
 
 
-class account_account(osv.osv):
+class account_account(orm.Model):
     _inherit = 'account.account'
 
     _columns = {
@@ -49,7 +49,7 @@ class account_account(osv.osv):
                 self.pool.get('account.move.line').write(cr, uid, move_line_ids, {'ecofi_taxid': account['datev_steuer']})
 
 
-class account_tax(osv.osv):
+class account_tax(orm.Model):
     _inherit = 'account.tax'
 
     _columns = {
@@ -57,7 +57,7 @@ class account_tax(osv.osv):
     }
 
 
-class account_payment_term(osv.osv):
+class account_payment_term(orm.Model):
     _inherit = 'account.payment.term'
 
     _columns = {
@@ -65,7 +65,7 @@ class account_payment_term(osv.osv):
     }
 
 
-class account_move(osv.osv):
+class account_move(orm.Model):
     _inherit = 'account.move'
 
     def datev_account_checks(self, cr, uid, move, context=None):
@@ -184,7 +184,7 @@ class account_move(osv.osv):
         return res
 
 
-class account_move_line(osv.osv):
+class account_move_line(orm.Model):
     _inherit = 'account.move.line'
 
     _columns = {

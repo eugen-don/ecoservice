@@ -20,14 +20,13 @@
 #    OpenERP, Open Source Management Solution
 #    Copyright (C) 2004-2010 Tiny SPRL (<http://tiny.be>).
 ##############################################################################
-from osv import osv, fields
+from openerp.osv import orm, fields
 from tools import ustr
 from tools.translate import _
-from openerp import addons
 from mako.template import Template as MakoTemplate
 
 
-class ecofi_datev_formate(osv.osv):
+class ecofi_datev_formate(orm.Model):
     _inherit = 'ecofi.datev.formate'
 
     def _get_export_type(self, cr, uid, context=None):

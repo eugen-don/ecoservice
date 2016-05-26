@@ -23,11 +23,10 @@
 #    Copyright (C) 2004-2010 Tiny SPRL (<http://tiny.be>).
 ##############################################################################
 
-from osv import osv
-from osv import fields
+from openerp.osv import orm, fields
 
 
-class res_company(osv.osv):
+class res_company(orm.Model):
     """ Inherits the res.company class and adds methods and attributes
     
     .. automethod:: _finance_interface_selection

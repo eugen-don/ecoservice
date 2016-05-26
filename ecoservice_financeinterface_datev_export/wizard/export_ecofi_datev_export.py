@@ -22,12 +22,11 @@
 ##############################################################################
 """ The export_ecofi_buchungsaetze module provides the wizard object the user calls when exporting
 """
-from osv import osv, fields
+from osv import orm, fields
 import datetime
-from tools.translate import _
 
 
-class datev_reference_data_export(osv.osv_memory):
+class datev_reference_data_export(orm.TransientModel):
     """ OSV Memory object the user calls when exporting
     """
     _name = 'datev.reference.data.export'

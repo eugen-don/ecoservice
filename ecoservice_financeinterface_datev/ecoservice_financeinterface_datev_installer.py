@@ -23,14 +23,14 @@
 #    Copyright (C) 2004-2010 Tiny SPRL (<http://tiny.be>).
 ##############################################################################
 
-from openerp.osv import fields, osv
+from openerp.osv import fields, orm
 from openerp import SUPERUSER_ID
 import socket
 import fcntl
 import struct
 
 
-class ecoservice_financeinterface_datev_installer(osv.osv_memory):
+class ecoservice_financeinterface_datev_installer(orm.TransientModel):
     """ Installer for the Datev interface
     """
     _name = 'ecoservice.financeinterface.datev.installer'

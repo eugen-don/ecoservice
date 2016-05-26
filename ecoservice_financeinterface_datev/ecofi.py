@@ -22,17 +22,16 @@
 #    OpenERP, Open Source Management Solution
 #    Copyright (C) 2004-2010 Tiny SPRL (<http://tiny.be>).
 ##############################################################################
-from openerp.osv import osv
+from openerp.osv import orm
 from decimal import Decimal
 from openerp.tools.translate import _
 from openerp.tools import ustr
-from openerp import workflow
 import logging
 
 _logger = logging.getLogger(__name__)
 
 
-class ecofi(osv.osv):
+class ecofi(orm.Model):
     """Inherits the ecofi class and adds methods and attributes
     """
     _inherit = 'ecofi'

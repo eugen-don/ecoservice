@@ -20,17 +20,16 @@
 #    OpenERP, Open Source Management Solution
 #    Copyright (C) 2004-2010 Tiny SPRL (<http://tiny.be>).
 ##############################################################################
-from osv import osv, fields
+from openerp.osv import orm, fields
 import csv
 import base64
 import cStringIO
 from tools import ustr
 from tools.translate import _
 from openerp import addons
-from decimal import Decimal
 
 
-class ecofi_datev_formate(osv.osv):
+class ecofi_datev_formate(orm.Model):
     """ Klasse um den Exportformate in Datev festzulegen"""
     _name = 'ecofi.datev.formate'
     _description = 'Configuration for Datev Reference Data Exports'
@@ -179,7 +178,7 @@ class ecofi_datev_formate(osv.osv):
         return True
 
 
-class ecofi_datev_spalten(osv.osv):
+class ecofi_datev_spalten(orm.Model):
     _name = 'ecofi.datev.spalten'
     _description = 'Configuration for Datev Reference Data Exports Columns'
     _order = 'datevid asc'
