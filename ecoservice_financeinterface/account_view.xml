@@ -97,7 +97,7 @@
                 	<field name="buchungsschluessel"/>
                 </field>
             </field>
-        </record> 
-   	</data>
+        </record>
+
+  </data>
 </openerp>
-	

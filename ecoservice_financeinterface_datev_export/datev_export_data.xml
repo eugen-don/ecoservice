@@ -23,26 +23,26 @@
 ##############################################################################
 -->
 <openerp>
-    <data>
+  <data>
 
-        <record model="ecofi.datev.formate" id="ecofi_datev_formate_default_debitoren">
-            <field name="name">Debitoren</field>
-            <field name="datev_domain">[('type','=','receivable')]</field>
-            <field name="datev_type">pktr</field>
-        </record>
+    <record model="ecofi.datev.formate" id="ecofi_datev_formate_default_debitoren">
+      <field name="name">Debitoren</field>
+      <field name="datev_domain">[('type','=','receivable')]</field>
+      <field name="datev_type">pktr</field>
+    </record>
 
-        <record model="ecofi.datev.formate" id="ecofi_datev_formate_default_zahlungsbedingungen">
-            <field name="name">Zahlungsbedingungen</field>
-            <field name="datev_domain">[]</field>
-            <field name="datev_type">pterm</field>
-        </record>
+    <record model="ecofi.datev.formate" id="ecofi_datev_formate_default_zahlungsbedingungen">
+      <field name="name">Zahlungsbedingungen</field>
+      <field name="datev_domain">[]</field>
+      <field name="datev_type">pterm</field>
+    </record>
 
-        <record model="ecofi.datev.formate" id="ecofi_datev_formate_default_kreditoren">
-            <field name="name">Kreditoren</field>
-            <field name="datev_domain">[('type','=','payable')]</field>
-            <field name="datev_type">pktr</field>
-        </record>
+    <record model="ecofi.datev.formate" id="ecofi_datev_formate_default_kreditoren">
+      <field name="name">Kreditoren</field>
+      <field name="datev_domain">[('type','=','payable')]</field>
+      <field name="datev_type">pktr</field>
+    </record>
 
-    </data>
+  </data>
 </openerp>
 

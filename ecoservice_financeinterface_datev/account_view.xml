@@ -24,6 +24,7 @@
 -->
 <openerp>
   <data>
+
     <!-- account.account -->
     <record id="view_account_form_inherit_ecofi_datev" model="ir.ui.view">
       <field name="name">account.account.form.inherit.ecofi.datev</field>
@@ -78,5 +79,6 @@
         </xpath>
       </field>
     </record>
+
   </data>
 </openerp>
