@@ -8,7 +8,7 @@
         'mail'
     ],
     'author': 'ecoservice',
-    'website': 'www.ecoservice.de',
+    'website': 'https://www.ecoservice.de',
     'description': """The module ecoservice_financeinterface_datev provides methods to convert account moves to the Datevformat (Datev Dok.-Nr.: 1036228).
 
 Details of the module:
@@ -16,16 +16,16 @@ Details of the module:
 * Test of datev accounting rules
  
 Further information under
-* Github: https://github.com/ecoservice/ecoservice/ecoservice
+* Github: https://github.com/ecoservice/ecoservice
 * Ecoservice Website https://www.ecoservice.de
 """,
     'category': 'Accounting',
     'data': [
-        'account_view.xml',
-        'account_invoice_view.xml',
-        'account_cron.xml',
-        'res_company_view.xml',
-        'ecoservice_financeinterface_datev_installer_view.xml',
+        'data/account_cron.xml',
+        'views/account_view.xml',
+        'views/account_invoice_view.xml',
+        'views/res_company_view.xml',
+        'views/ecoservice_financeinterface_datev_installer_view.xml',
         'workflow/account_invoice_workflow.xml'
     ],
     'demo': [],

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from openerp.addons.ecoservice_financeinterface.exceptions import FinanceinterfaceException
+from openerp.addons.ecoservice_financeinterface.models.exceptions import FinanceinterfaceException
 
 
 class DatevWarning(FinanceinterfaceException):
