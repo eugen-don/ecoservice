@@ -22,7 +22,7 @@
 ##############################################################################
 {
     'name': 'Ecoservice Financial Interface',
-    'version': '7.0.1.1',
+    'version': '7.0.1.1.1',
     'depends': [
         'base',
         'account'
