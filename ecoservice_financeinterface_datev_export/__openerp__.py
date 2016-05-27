@@ -7,7 +7,7 @@
         'ecoservice_financeinterface'
     ],
     'author': 'ecoservice',
-    'website': 'www.ecoservice.de',
+    'website': 'https://www.ecoservice.de',
     'description': """The module ecoservice_financeinterface_datev_export lets you configure different ascii base data exports.
 
 Details of the module:
@@ -15,15 +15,15 @@ Details of the module:
 * Export of Debit and Credit Account
 
 Further information under
-* Github: https://github.com/ecoservice/ecoservice/ecoservice
+* Github: https://github.com/ecoservice/ecoservice
 * Ecoservice Website https://www.ecoservice.de
 """,
     'category': 'Accounting',
     'data': [
-        'datev_export.xml',
-        'datev_export_data.xml',
-        'wizard/export_ecofi_datev_export.xml',
         'security/ir.model.access.csv',
+        'data/datev_export_data.xml',
+        'views/datev_export_view.xml',
+        'wizard/export_ecofi_datev_export.xml'
     ],
     'demo': [],
     'test': [],

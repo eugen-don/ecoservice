@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*-
 
-import ecofi
-import account
-import wizard
-import res_company
+from . import models
+from . import wizard
