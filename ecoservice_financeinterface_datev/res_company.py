@@ -23,31 +23,31 @@
 #    Copyright (C) 2004-2010 Tiny SPRL (<http://tiny.be>).
 ##############################################################################
 
-from openerp.osv import osv
-from openerp.osv import fields
+from openerp.osv import orm, fields
 
 
-class res_company(osv.osv):
+class res_company(orm.Model):
     """ Inherits the res.company class and adds methods and attributes
 
     .. automethod:: _finance_interface_selection
     """
-    _inherit = "res.company"
+    _inherit = 'res.company'
 
-    def _finance_interface_selection(self, cr, uid, context={}):
+    def _finance_interface_selection(self, cr, uid, context=None):
         """Appends datev as possible export format
 
         .. seealso::
             :class:`ecoservice_financeinterface.ecofi.ecofi.ecofi_buchungen`
         """
+        context = context or dict()
         res = super(res_company, self)._finance_interface_selection(cr, uid, context=context)
         res.append(('datev', 'Datev'))
         return res
 
     _columns = {
-                'finance_interface': fields.selection(_finance_interface_selection, 'Finance Interface'),
-                'exportmethod': fields.selection([
-                    ('netto', 'netto'),
-                    ('brutto', 'brutto'),], 'Exportmethod'),
+        'finance_interface': fields.selection(_finance_interface_selection, 'Finance Interface'),
+        'exportmethod': fields.selection([
+            ('netto', 'netto'),
+            ('brutto', 'brutto'),
+        ], 'Exportmethod'),
     }
-res_company()

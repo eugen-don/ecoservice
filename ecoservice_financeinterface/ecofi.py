@@ -1,4 +1,4 @@
-# -*- encoding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """ The ecofi module provides the basic objects to export account moves as csv data
 """
 ##############################################################################
@@ -22,7 +22,8 @@
 #    OpenERP, Open Source Management Solution
 #    Copyright (C) 2004-2010 Tiny SPRL (<http://tiny.be>).
 ##############################################################################
-from openerp.osv import fields, osv
+
+from openerp.osv import fields, orm
 from openerp.tools.translate import _
 import base64
 import cStringIO
@@ -33,26 +34,26 @@ from datetime import datetime
 import re
 
 
-class ecofi(osv.osv):
+class ecofi(orm.Model):
     """
     The class ecofi is the central object to generate a csv file for the selected moves that
     can be used to be imported in the different financial programms
     """
     _name = 'ecofi'
     _description = 'Ecoservice Financial Interface'
-    _zahlungsbedingungen = []
+    _zahlungsbedingungen = list()
     _columns = {
-                'name': fields.char('Exportname', size=64, required=True, readonly=True),
-                'journale': fields.char('Journals', size=128, required=True, readonly=True),
-                'zeitraum': fields.char('Period', size=128, required=True, readonly=True),
-                'csv_file': fields.binary('Export CSV', readonly=True),
-                'csv_file_fname': fields.char('Stored Filename', size=256),
-                'account_moves': fields.one2many('account.move', 'vorlauf_id', 'Account Moves', readonly=True),
-                'partner_error_ids': fields.many2many('res.partner', 'ecofi_res_partner_error_rel',
-                    'ecofi_id', 'res_partner_id', 'Partner Errors'),
-                'move_error_ids': fields.many2many('account.move', 'ecofi_eccount_move_error_rel',
-                    'ecofi_id', 'account_move_id', 'Move Errors'),
-                'note': fields.text('Comment'),
+        'name': fields.char('Exportname', size=64, required=True, readonly=True),
+        'journale': fields.char('Journals', size=128, required=True, readonly=True),
+        'zeitraum': fields.char('Period', size=128, required=True, readonly=True),
+        'csv_file': fields.binary('Export CSV', readonly=True),
+        'csv_file_fname': fields.char('Stored Filename', size=256),
+        'account_moves': fields.one2many('account.move', 'vorlauf_id', 'Account Moves', readonly=True),
+        'partner_error_ids': fields.many2many('res.partner', 'ecofi_res_partner_error_rel',
+                                              'ecofi_id', 'res_partner_id', 'Partner Errors'),
+        'move_error_ids': fields.many2many('account.move', 'ecofi_eccount_move_error_rel',
+                                           'ecofi_id', 'account_move_id', 'Move Errors'),
+        'note': fields.text('Comment'),
     }
 
     def replace_non_ascii_characters(self, text, replacement='?'):
@@ -67,7 +68,7 @@ class ecofi(osv.osv):
         :param context: context arguments, like lang, time zone
         :param default: default values
         """
-        raise osv.except_osv(_('Warning!'), _('Exports cannot be duplicated.'))
+        raise orm.except_orm(_(u'Warning!'), _(u'Exports cannot be duplicated.'))
 
     def is_taxline(self, cr, account_id):
         """Method to check if the selected account is a tax account
@@ -77,10 +78,7 @@ class ecofi(osv.osv):
         """
         cr.execute("Select id from account_tax where account_collected_id = %s or account_paid_id = %s" % (account_id, account_id))
         taxids = map(lambda x: x[0], cr.fetchall())
-        if len(taxids) > 0:
-            return True
-        else:
-            return False
+        return len(taxids) > 0
 
     def get_tax_account(self, cr, uid, line, context=None):
         """ Calculates and returns the account of tax that has to be considered for an account_move_line.
@@ -89,8 +87,7 @@ class ecofi(osv.osv):
         :param line: account_move_line
         :param context: context arguments, like lang, time zone
         """
-        if context is None:
-            context = {}
+        context = context or dict()
         linetax = self.get_line_tax(cr, uid, line)
         tax_account = False
         if linetax:
@@ -100,7 +97,7 @@ class ecofi(osv.osv):
             else:
                 tax_account = linetax.account_collected_id
         return tax_account
-    
+
     def get_tax(self, cr, account_id):
         """Method to get the tax for the selected account
 
@@ -133,8 +130,7 @@ class ecofi(osv.osv):
         :param line: account_move_line
         :param context: context arguments, like lang, time zone
         """
-        if context is None:
-            context = {}
+        context = context or dict()
         linetax = self.get_line_tax(cr, uid, line)
         texamount = 0
         if linetax:
@@ -147,10 +143,9 @@ class ecofi(osv.osv):
             if 'return_calc' in context and context['return_calc'] is True:
                 return []
         return texamount
-    
-    def calc_tax(self, cr, uid,tax_object, amount, context=None):
-        if context is None:
-            context = {}
+
+    def calc_tax(self, cr, uid, tax_object, amount, context=None):
+        context = context or dict()
         texamount = 0
         if tax_object:
             taxes = self.pool.get('account.tax')._compute(cr, uid, [tax_object], amount, 1)
@@ -161,9 +156,9 @@ class ecofi(osv.osv):
         else:
             if 'return_calc' in context and context['return_calc'] is True:
                 return []
-        return texamount            
+        return texamount
 
-    def set_main_account(self, cr, uid, move, context={}):
+    def set_main_account(self, cr, uid, move, context=None):
         """ This methods sets the main account of the corresponding account_move
 
         :param cr: the current row, from the database cursor
@@ -182,14 +177,15 @@ class ecofi(osv.osv):
         a. Test if there is an invoice connected to the move_id and test if the invoice
             account_id is in the move than this is the mainaccount
         """
+        context = context or dict()
         sollcount = 0
         habencount = 0
         ecofikonto = False
         ecofikontoid = False
         ecofikonto_no_invoice = False
-        sollkonto = []
-        habenkonto = []
-        nullkonto = []
+        sollkonto = list()
+        habenkonto = list()
+        nullkonto = list()
         error = False
         for line in move.line_id:
             Umsatz = Decimal(str(0))
@@ -212,14 +208,14 @@ class ecofi(osv.osv):
             ecofikonto = habenkonto[0]
         elif sollcount > 1 and habencount > 1:
             if sollcount > habencount:
-                habennotax = []
+                habennotax = list()
                 for haben in habenkonto:
                     if self.is_taxline(cr, haben.id) is False:
                         habennotax.append(haben)
                 if len(habennotax) == 1:
                     ecofikonto = habennotax[0]
             elif sollcount < habencount:
-                sollnotax = []
+                sollnotax = list()
                 for soll in sollkonto:
                     if self.is_taxline(cr, soll.id) is False:
                         sollnotax.append(soll)
@@ -242,7 +238,7 @@ class ecofi(osv.osv):
                         inbooking = True
                         ecofikonto = hk
             if inbooking is False and invoice_ids:
-                error = _("The main account of the booking could not be resolved, the move has %s credit- and %s debitlines!") % (sollcount, habencount)
+                error = _(u"The main account of the booking could not be resolved, the move has %s credit- and %s debitlines!") % (sollcount, habencount)
                 error += "\n"
             else:
                 ecofikonto = ecofikonto_no_invoice
@@ -254,7 +250,7 @@ class ecofi(osv.osv):
         return error
 
     def generate_csv_move_lines(self, cr, uid, move, buchungserror, errorcount, thislog, thismovename, exportmethod,
-                          partnererror, buchungszeilencount, bookingdict, context=None):
+                                partnererror, buchungszeilencount, bookingdict, context=None):
         """Method to be implemented for each Interface, generates the corresponding csv entries for each move
 
         :param cr: the current row, from the database cursor
@@ -270,11 +266,9 @@ class ecofi(osv.osv):
         :param bookingdict: Dictionary that contains generated Bookinglines and Headers
         :param context: context arguments, like lang, time zone
         """
-        if context is None:
-            context = {}
         return buchungserror, errorcount, thislog, partnererror, buchungszeilencount, bookingdict
 
-    def generate_csv(self, cr, uid, ecofi_csv, bookingdict, log, context={}):
+    def generate_csv(self, cr, uid, ecofi_csv, bookingdict, log, context=None):
         """ Method to be implemented for each Interface, generates the corresponding csv entries for each move
         
         :param cr: the current row, from the database cursor
@@ -285,8 +279,8 @@ class ecofi(osv.osv):
         :param context: context arguments, like lang, time zone
         """
         return ecofi_csv, log
-    
-    def pre_export(self, cr, uid, account_move_ids, context={}):
+
+    def pre_export(self, cr, uid, account_move_ids, context=None):
         """ Method to call before the Import starts and the moves to export are going to be browsed
         
         :param cr: the current row, from the database cursor
@@ -297,8 +291,8 @@ class ecofi(osv.osv):
         :param context: context arguments, like lang, time zone
         """
         return True
-                   
-    def ecofi_buchungen(self, cr, uid, journal_ids=[], vorlauf_id=False, period=False, context={}, date_from=False, date_to=False):
+
+    def ecofi_buchungen(self, cr, uid, journal_ids=None, vorlauf_id=False, period=False, date_from=False, date_to=False, context=None):
         """ Method that generates the csv export by the given parameters
         
         :param cr: the current row, from the database cursor
@@ -316,8 +310,9 @@ class ecofi(osv.osv):
         """
         buf = cStringIO.StringIO()
         ecofi_csv = csv.writer(buf, delimiter=';', quotechar='"')
-        partnererror = []
-        buchungserror = []
+        partnererror = list()
+        buchungserror = list()
+        journal_ids = journal_ids or list()
         exportmethod = ''
         user = self.pool.get('res.users').browse(cr, uid, [uid], context)[0]
         if user.company_id.finance_interface:
@@ -332,25 +327,26 @@ class ecofi(osv.osv):
         if len(journal_ids) == 0:
             if user.company_id.journal_ids:
                 if len(user.company_id.journal_ids) == 0:
-                    return (_("There is no journal for the ecofi_export configured!"), False, 'none', buchungserror, partnererror)
+                    return (_(u"There is no journal for the ecofi_export configured!"), False, 'none', buchungserror, partnererror)
                 journalname = ''
                 for journal in user.company_id.journal_ids:
                     journalname += ustr(journal.name) + ','
                     journal_ids.append(journal.id)
-                journalname = journalname[:-1]                   
+                journalname = journalname[:-1]
             else:
-                return (_("There is no journal for the ecofi_export configured!"), False, 'none', buchungserror, partnererror)
+                return (_(u"There is no journal for the ecofi_export configured!"), False, 'none', buchungserror, partnererror)
         else:
             journalname = ''
             for journal in self.pool.get('account.journal').browse(cr, uid, journal_ids, context=context):
                 journalname += ustr(journal.name) + ','
-            journalname = journalname[:-1]                   
+            journalname = journalname[:-1]
         if vorlauf_id is not False:
             account_move_searchdomain = [('vorlauf_id', '=', vorlauf_id)]
         else:
-            account_move_searchdomain = [('journal_id', 'in', journal_ids),
-                                         ('state', '=', 'posted'),
-                                         ('vorlauf_id', '=', False)
+            account_move_searchdomain = [
+                ('journal_id', 'in', journal_ids),
+                ('state', '=', 'posted'),
+                ('vorlauf_id', '=', False)
             ]
             if period:
                 account_move_searchdomain.append(('period_id', '=', period))
@@ -372,54 +368,55 @@ class ecofi(osv.osv):
                     except:
                         pass
                     zeitraum = str(date_from) + " - " + str(date_to)
-                vorlauf_id = self.pool.get('ecofi').create(cr, uid, {'name': str(vorlaufname),
-                                                               'zeitraum': zeitraum,
-                                                               'journale': ustr(journalname)
-                                                               })
+                vorlauf_id = self.pool.get('ecofi').create(cr, uid, {
+                    'name': str(vorlaufname),
+                    'zeitraum': zeitraum,
+                    'journale': ustr(journalname)
+                })
             else:
                 vorlaufname = self.pool.get('ecofi').browse(cr, uid, [vorlauf_id], context=context)[0]['name']
-            thislog += _("This export is conducted under the Vorlaufname: %s") % (vorlaufname)
+            thislog += _(u"This export is conducted under the Vorlaufname: %s") % (vorlaufname)
             thislog += "\n"
             thislog += "-----------------------------------------------------------------------------------\n"
-            thislog += _("Start export")
+            thislog += _(u"Start export")
             thislog += "\n"
             bookingdictcount = 0
             buchungszeilencount = 0
             errorcount = 0
             warncount = 0
-            bookingdict = {}
+            bookingdict = dict()
             self.pre_export(cr, uid, account_move_ids, context)
             for move in self.pool.get('account.move').browse(cr, uid, account_move_ids):
-                self.pool.get('account.move').write(cr, uid, [move.id], {'vorlauf_id': vorlauf_id})  
+                self.pool.get('account.move').write(cr, uid, [move.id], {'vorlauf_id': vorlauf_id})
                 thismovename = ustr(move.name) + ", " + ustr(move.ref) + ": "
                 bookingdictcount += 1
-                buchungserror, errorcount, thislog, partnererror, buchungszeilencount, bookingdict = self.generate_csv_move_lines(cr, uid, move, buchungserror, errorcount, thislog, thismovename, exportmethod, # pylint: disable-msg=C0301
-                          partnererror, buchungszeilencount, bookingdict, context=context)
+                buchungserror, errorcount, thislog, partnererror, buchungszeilencount, bookingdict = self.generate_csv_move_lines(cr, uid, move, buchungserror, errorcount, thislog, thismovename, exportmethod,  # pylint: disable-msg=C0301
+                                                                                                                                  partnererror, buchungszeilencount, bookingdict, context=context)
             ecofi_csv, thislog = self.generate_csv(cr, uid, ecofi_csv, bookingdict, thislog, context=context)
             if errorcount == 0:
                 out = base64.encodestring(buf.getvalue())
             else:
                 out = base64.encodestring(buf.getvalue())
-            thislog += _("Export finished")
+            thislog += _(u"Export finished")
             thislog += "\n"
             thislog += "-----------------------------------------------------------------------------------\n\n"
-            thislog += _("Edited posting record : %s") % (bookingdictcount)
+            thislog += _(u"Edited posting record : %s") % (bookingdictcount)
             thislog += "\n"
-            thislog += _("Edited posting lines: %s") % (buchungszeilencount)
+            thislog += _(u"Edited posting lines: %s") % (buchungszeilencount)
             thislog += "\n"
-            thislog += _("Warnings: %s") % (warncount)
+            thislog += _(u"Warnings: %s") % (warncount)
             thislog += "\n"
-            thislog += _("Error: %s") % (errorcount)
+            thislog += _(u"Error: %s") % (errorcount)
             thislog += "\n"
-            self.pool.get('ecofi').write(cr, uid, vorlauf_id, {'csv_file': out,
-                                                               'csv_file_fname': '%s.csv' % (vorlaufname),
-                                                               'note': thislog,
-                                                               'partner_error_ids': [(6, 0, list(set(partnererror)))],
-                                                               'move_error_ids': [(6, 0, list(set(buchungserror)))],
-                                                               }) 
+            self.pool.get('ecofi').write(cr, uid, vorlauf_id, {
+                'csv_file': out,
+                'csv_file_fname': '%s.csv' % (vorlaufname),
+                'note': thislog,
+                'partner_error_ids': [(6, 0, list(set(partnererror)))],
+                'move_error_ids': [(6, 0, list(set(buchungserror)))],
+            })
         else:
-            thislog = _("No posting records found")
+            thislog = _(u"No posting records found")
             out = False
             vorlauf_id = False
         return vorlauf_id
-ecofi()

@@ -1,4 +1,4 @@
-# -*- encoding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """ The export_ecofi_buchungsaetze module provides the wizard object the user calls when exporting
 """
 ##############################################################################
@@ -22,11 +22,12 @@
 #    OpenERP, Open Source Management Solution
 #    Copyright (C) 2004-2010 Tiny SPRL (<http://tiny.be>).
 ##############################################################################
+
 import time
-from osv import osv, fields
+from openerp.osv import orm, fields
 
 
-class export_ecofi(osv.osv_memory):
+class export_ecofi(orm.TransientModel):
     _name = 'export.ecofi'
     _description = 'Financeexport'
     """ OSV Memory object the user calls when exporting
@@ -36,20 +37,19 @@ class export_ecofi(osv.osv_memory):
         period_default = self.pool.get('account.period').search(cr, uid, [('date_start', '<=', time.strftime('%Y-%m-%d')),
                                                                      ('date_stop', '>=', time.strftime('%Y-%m-%d')),
                                                                      ('company_id', '=', user.company_id.id)])
-        if len(period_default) == 0:
-            return False
-        else:
-            return period_default[0]
+        return False if len(period_default) == 0 else period_default[0]
 
     def _get_default_journal(self, cr, uid, context=None):
+        context = context or dict()
         user = self.pool.get('res.users').browse(cr, uid, [uid], context)[0]
-        journal_ids = []
+        journal_ids = list()
         if user.company_id.finance_interface:
             for journal in user.company_id.journal_ids:
                 journal_ids.append(journal.id)
         return journal_ids
 
-    def _get_default_vorlauf(self, cr, uid, context={}):
+    def _get_default_vorlauf(self, cr, uid, context=None):
+        context = context or dict()
         vorlauf = False
         if 'active_model' in context and 'active_id' in context:
             if context['active_model'] == 'ecofi':
@@ -102,7 +102,7 @@ class export_ecofi(osv.osv_memory):
             elif export.export_type == 'date':
                 date_from = export.date_from
                 date_to = export.date_to
-            journal_ids = []
+            journal_ids = list()
             for journal in export.journal_id:
                 journal_ids.append(journal.id)
             vorlauf = exportecofi.ecofi_buchungen(cr, uid, journal_ids=journal_ids, vorlauf_id=thisvorlauf, period=period, context=context, date_from=date_from, date_to=date_to)
@@ -116,4 +116,3 @@ class export_ecofi(osv.osv_memory):
             'target': 'current',
             'res_id': vorlauf,
         }
-export_ecofi()

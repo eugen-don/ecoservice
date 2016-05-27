@@ -23,37 +23,39 @@
 ##############################################################################
 -->
 <openerp>
-<data>
+  <data>
 
-        <record id="datev_export_view" model="ir.ui.view">
-             <field name="name">Create Reference Data Export</field>
-             <field name="model">datev.reference.data.export</field>
-             <field name="type">form</field>
-             <field name="arch" type="xml">
-                <form string="Reference Export" version="7.0">
-                	<field name="export_format_id" colspan="4"/>        	  	
-                    <button icon="gtk-ok" string="Start Export" name="startexport" type="object" colspan="4"/>
-                    
-                    <field name="file_export_log" colspan="4"/>
-                    <div>
-                        <p>Exportfile: <field name="file_export" readonly="1" filename="file_export_name"/></p>
-                    </div>
-                    <button icon="gtk-cancel" special="cancel" string="Cancel" colspan="4"/>   
-                </form>
-             </field>
-         </record>
+    <record id="datev_export_view" model="ir.ui.view">
+      <field name="name">Create Reference Data Export</field>
+      <field name="model">datev.reference.data.export</field>
+      <field name="type">form</field>
+      <field name="arch" type="xml">
+        <form string="Reference Export" version="7.0">
+          <field name="export_format_id" colspan="4"/>
+          <button icon="gtk-ok" string="Start Export" name="startexport" type="object" colspan="4"/>
 
-        <record id="datev_export_wizard" model="ir.actions.act_window">
-             <field name="name">Create Reference Data Export</field>
-             <field name="res_model">datev.reference.data.export</field>
-             <field name="type">ir.actions.act_window</field>
-             <field name="view_type">form</field>
-             <field name="view_mode">tree,form</field>
-             <field name="view_id" ref="datev_export_view"/>
-             <field name="target">new</field>
-       </record>
+          <field name="file_export_log" colspan="4"/>
+          <div>
+            <p>Exportfile:
+              <field name="file_export" readonly="1" filename="file_export_name"/>
+            </p>
+          </div>
+          <button icon="gtk-cancel" special="cancel" string="Cancel" colspan="4"/>
+        </form>
+      </field>
+    </record>
 
-        <menuitem
+    <record id="datev_export_wizard" model="ir.actions.act_window">
+      <field name="name">Create Reference Data Export</field>
+      <field name="res_model">datev.reference.data.export</field>
+      <field name="type">ir.actions.act_window</field>
+      <field name="view_type">form</field>
+      <field name="view_mode">tree,form</field>
+      <field name="view_id" ref="datev_export_view"/>
+      <field name="target">new</field>
+    </record>
+
+    <menuitem
             icon="STOCK_EXECUTE"
             name="Create Reference Data Export"
             action="datev_export_wizard"
@@ -61,8 +63,7 @@
             parent="ecoservice_financeinterface.menu_finance_interface"
             groups="ecoservice_financeinterface.group_ecofi_financeinterface"/>
 
- 
-        
-</data>
+
+  </data>
 </openerp>
 

@@ -1,4 +1,4 @@
-# -*- encoding: utf-8 -*-
+# -*- coding: utf-8 -*-
 ##############################################################################
 #    ecoservice_financeinterface
 #    Copyright (c) 2013 ecoservice GbR (<http://www.ecoservice.de>).
@@ -20,5 +20,5 @@
 #    OpenERP, Open Source Management Solution
 #    Copyright (C) 2004-2010 Tiny SPRL (<http://tiny.be>).
 ##############################################################################
-import export_ecofi_buchungsaetze
 
+from . import export_ecofi_buchungsaetze

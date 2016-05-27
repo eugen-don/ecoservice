@@ -135,7 +135,7 @@ class TestEcoserviceFinanceinterface(TransactionCase):
                 self.assertEqual(move_line.ecofi_taxid.id, self.tax_id, 
                                                     "Tax was not passed correctly to account move!")
         self.account_move.write(cr, uid, [thisinvoice.move_id.id], {'name': 'TIN01'})
-        checklist = []
+        checklist = list()
         checklist.append({'ident': [('Belegfeld 1', 'TIN01')],
                           'check': {'BU-Schl\xfcssel ': '9', 
                                     'Konto': 'X11002', 
@@ -209,7 +209,7 @@ class TestEcoserviceFinanceinterface(TransactionCase):
                 }      
         self.account_move_line.create(cr, uid, line)
         self.account_move.button_validate(cr, uid, [move_id])
-        checklist = []
+        checklist = list()
         checklist.append({'ident': [('Belegfeld 1', 'TESTMOVE01')],
                           'check': {'BU-Schl\xfcssel ': '9', 
                                     'Konto': 'X11002', 
@@ -256,7 +256,7 @@ class TestEcoserviceFinanceinterface(TransactionCase):
                 }      
         self.account_move_line.create(cr, uid, line)
         self.account_move.button_validate(cr, uid, [move_id])
-        checklist = []
+        checklist = list()
         checklist.append({'ident': [('Belegfeld 1', 'TESTMOVE01')],
                           'check': {'BU-Schl\xfcssel ': '9', 
                                     'Konto': 'X1111', 
@@ -307,7 +307,7 @@ class TestEcoserviceFinanceinterface(TransactionCase):
                 }      
         self.account_move_line.create(cr, uid, line)
         self.account_move.button_validate(cr, uid, [move_id])
-        checklist = []
+        checklist = list()
         checklist.append({'ident': [('Belegfeld 1', 'TESTMOVE01')],
                           'check': {'BU-Schl\xfcssel ': '', 
                                     'Konto': 'X11002', 
