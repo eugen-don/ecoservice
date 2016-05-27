@@ -178,75 +178,69 @@ class ecofi(orm.Model):
             account_id is in the move than this is the mainaccount
         """
         context = context or dict()
-        sollcount = 0
-        habencount = 0
         ecofikonto = False
-        ecofikontoid = False
-        ecofikonto_no_invoice = False
         sollkonto = list()
         habenkonto = list()
         nullkonto = list()
         error = False
+        ecofikonto_no_invoice = move.line_id[0].account_id
+
         for line in move.line_id:
-            Umsatz = Decimal(str(0))
-            Umsatz += Decimal(str(line.debit))
-            Umsatz -= Decimal(str(line.credit))
-            ecofikonto_no_invoice = move.line_id[0].account_id
+            Umsatz = Decimal(str(line.debit)) - Decimal(str(line.credit))
             if Umsatz < 0:
-                habencount += 1
                 habenkonto.append(line.account_id)
             elif Umsatz > 0:
-                sollcount += 1
                 sollkonto.append(line.account_id)
             else:
                 nullkonto.append(line.account_id)
-        if sollcount == 1 and habencount == 1:
+        if len(sollkonto) == 1 and len(habenkonto) == 1:
             ecofikonto = move.line_id[0].account_id
-        elif sollcount == 1 and habencount > 1:
+        elif len(sollkonto) == 1 and len(habenkonto) > 1:
             ecofikonto = sollkonto[0]
-        elif sollcount > 1 and habencount == 1:
+        elif len(sollkonto) > 1 and len(habenkonto) == 1:
             ecofikonto = habenkonto[0]
-        elif sollcount > 1 and habencount > 1:
-            if sollcount > habencount:
+        elif len(sollkonto) > 1 and len(habenkonto) > 1:
+            if len(sollkonto) > len(habenkonto):
                 habennotax = list()
                 for haben in habenkonto:
-                    if self.is_taxline(cr, haben.id) is False:
+                    if not self.is_taxline(cr, haben.id):
                         habennotax.append(haben)
                 if len(habennotax) == 1:
                     ecofikonto = habennotax[0]
-            elif sollcount < habencount:
+            elif len(sollkonto) < len(habenkonto):
                 sollnotax = list()
                 for soll in sollkonto:
-                    if self.is_taxline(cr, soll.id) is False:
+                    if not self.is_taxline(cr, soll.id):
                         sollnotax.append(soll)
                 if len(sollnotax) == 1:
                     ecofikonto = sollnotax[0]
-        if ecofikonto is False:
+        if not ecofikonto:
             if 'invoice_ids' in context:
                 invoice_ids = context['invoice_ids']
             else:
                 invoice_ids = self.pool.get('account.invoice').search(cr, uid, [('move_id', '=', move.id)])
-            inbooking = False
+            in_booking = False
+            invoice_mainaccount = False
             if len(invoice_ids) == 1:
-                invoice_mainaccount = self.pool.get('account.invoice').browse(cr, uid, invoice_ids[0], context=context).account_id.id
+                invoice_mainaccount = self.pool.get('account.invoice').browse(cr, uid, invoice_ids[0], context=context).account_id
                 for sk in sollkonto:
-                    if sk.id == invoice_mainaccount:
-                        inbooking = True
-                        ecofikonto = sk
+                    if sk == invoice_mainaccount:
+                        in_booking = True
+                        break
                 for hk in habenkonto:
-                    if hk.id == invoice_mainaccount:
-                        inbooking = True
-                        ecofikonto = hk
-            if inbooking is False and invoice_ids:
-                error = _(u"The main account of the booking could not be resolved, the move has %s credit- and %s debitlines!") % (sollcount, habencount)
+                    if hk == invoice_mainaccount:
+                        in_booking = True
+                        break
+            if not in_booking and invoice_ids:
+                error = _(u"The main account of the booking could not be resolved, the move has %s credit- and %s debitlines!") % (len(sollkonto), len(habenkonto))
                 error += "\n"
-            else:
                 ecofikonto = ecofikonto_no_invoice
+            else:
+                ecofikonto = invoice_mainaccount
         if ecofikonto:
-            ecofikontoid = ecofikonto.id  # pylint: disable-msg=E1103
-            ecofikonto = ustr(ecofikonto.code)  # pylint: disable-msg=E1103
-            for line in move.line_id:
-                self.pool.get('account.move.line').write(cr, uid, [line.id], {'ecofi_account_counterpart': ecofikontoid}, context=context, check=False, update_check=True)
+            self.pool.get('account.move.line').write(cr, uid, [l.id for l in move.line_id],
+                                                     {'ecofi_account_counterpart': ecofikonto.id},
+                                                     context=context, check=False, update_check=True)
         return error
 
     def generate_csv_move_lines(self, cr, uid, move, buchungserror, errorcount, thislog, thismovename, exportmethod,
@@ -356,7 +350,7 @@ class ecofi(orm.Model):
         account_move_ids = self.pool.get('account.move').search(cr, uid, account_move_searchdomain)
         if len(account_move_ids) != 0:
             thislog = ""
-            if vorlauf_id is False:
+            if not vorlauf_id:
                 vorlaufname = self.pool.get('ir.sequence').get(cr, uid, 'ecofi.vorlauf')
                 zeitraum = ""
                 if period:
