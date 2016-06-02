@@ -50,4 +50,7 @@ class res_company(orm.Model):
             ('netto', 'netto'),
             ('brutto', 'brutto'),
         ], 'Exportmethod'),
+        'enable_datev_checks': fields.boolean('Perform Datev Checks')
     }
+
+    _defaults = {'enable_datev_checks': True}

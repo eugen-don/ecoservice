@@ -25,3 +25,4 @@ from . import account
 from . import res_company
 from . import ecofi
 from . import ecoservice_financeinterface_datev_installer
+from . import account_invoice

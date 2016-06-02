@@ -159,3 +159,73 @@ msgid "The account is an Autoaccount, altough the taxaccount (%s) in the movelin
 msgstr "Das Konto ist als Automatikkonto definiert, allerdings unterscheidet sich die Steuer (%s) in Buchungszeile %s von der vorkonfigurierten %s!\n"
 ""
 
+#. module: ecoservice_financeinterface_datev
+#: field:account.move,enable_datev_checks:0
+#: field:account.invoice,enable_datev_checks:0
+#: field:res.company,enable_datev_checks:0
+msgid "Perform Datev Checks"
+msgstr "Datev-Checks durchführen"
+
+#. module: ecoservice_financeinterface_datev
+#: code:addons/ecoservice_financeinterface_datev/account_invoice.py:106
+#, python-format
+msgid "Line {line}: The taxes specified in the invoice line ({tax_line}) and the corresponding account ({tax_account}) mismatch!"
+msgstr "Position {line}: Die Steuern, die in der Rechnungsposition ({tax_line}) und dem entsprechenden Konto ({tax_account}) spezifiziert wurden, stimmen nicht überein!"
+
+#. module: ecoservice_financeinterface_datev
+#: code:addons/ecoservice_financeinterface_datev/account_invoice.py:78
+#: code:addons/ecoservice_financeinterface_datev/account_invoice.py:105
+#, python-format
+msgid "Datev Error"
+msgstr "Datev Fehler"
+
+#. module: ecoservice_financeinterface_datev
+#: code:addons/ecoservice_financeinterface_datev/account.py:161
+#, python-format
+msgid "The sum for the tax is different between booked %s and calculated %s!\n"
+""
+msgstr "Die Summe der Steuer unterscheidet sich ziwschen gebucht %s und berechnet %s!\n"
+""
+
+#. module: ecoservice_financeinterface_datev
+#: code:addons/ecoservice_financeinterface_datev/account.py:101
+#, python-format
+msgid "The account is an Autoaccount, altough the taxaccount in the moveline %s is not set!\n"
+""
+msgstr "Das Konto ist als Automatikkonto definiert, allerdings ist in Zeile %s keine Steuer definiert!\n"
+""
+
+#. module: ecoservice_financeinterface_datev
+#: code:addons/ecoservice_financeinterface_datev/account.py:90
+#, python-format
+msgid "The Account requires a tax, although the moveline %s has no tax!\n"
+""
+msgstr "Das Konto benötigt eine Steuerbuchung, allerdings ist in Zeile %s keine Steuer definiert!\n"
+""
+
+#. module: ecoservice_financeinterface_datev
+#: code:addons/ecoservice_financeinterface_datev/account.py:88
+#, python-format
+msgid "The account %s is an Autoaccount, although the automatic taxes are not configured!\n"
+""
+msgstr "Das Konto %s ist als Automatikkonto definiert, allerdings ist die automatische Steuer nicht vorkonfiguriert!\n"
+""
+
+#. module: ecoservice_financeinterface_datev
+#: code:addons/ecoservice_financeinterface_datev/account.py:94
+#: code:addons/ecoservice_financeinterface_datev/account.py:98
+#, python-format
+msgid "The account is an Autoaccount, altough the taxaccount (%s) in the moveline %s is an other than the configured %s!\n"
+""
+msgstr "Das Konto ist als Automatikkonto definiert, allerdings unterscheidet sich die Steuer (%s) in Buchungszeile %s von der vorkonfigurierten %s!\n"
+""
+
+#. module: ecoservice_financeinterface_datev
+#: code:addons/ecoservice_financeinterface_datev/account.py:0
+msgid "The booking key for the tax {tax} is not configured!"
+msgstr "Der Buchungsschlüssel für die Steuer {tax} ist nicht konfiguriert!"
+
+
+
+
+
