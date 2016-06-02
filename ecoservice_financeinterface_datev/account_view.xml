@@ -77,6 +77,10 @@
         <xpath expr="/form/sheet/notebook/page/field/tree/field[@name='ecofi_taxid']" position="after">
           <field name="ecofi_bu" select="2"/>
         </xpath>
+
+        <field name="date" position="after">
+          <field name="enable_datev_checks"/>
+        </field>
       </field>
     </record>
 

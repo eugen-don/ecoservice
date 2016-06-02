@@ -42,9 +42,11 @@ Further information under
     'category': 'Accounting',
     'data': [
         'account_view.xml',
+        'account_invoice_view.xml',
         'account_cron.xml',
         'res_company_view.xml',
-        'ecoservice_financeinterface_datev_installer_view.xml'
+        'ecoservice_financeinterface_datev_installer_view.xml',
+        'workflow/account_invoice_workflow.xml',
     ],
     'demo': [],
     'test': [],

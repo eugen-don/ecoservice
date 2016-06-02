@@ -34,6 +34,10 @@
         <page string="Financeinterface" position="inside">
           <field name="exportmethod" colspan="4" attrs="{'invisible' : [('finance_interface','!=','datev')]}"/>
         </page>
+
+        <field name="finance_interface" position="after">
+          <field name="enable_datev_checks" attrs="{'invisible': [('finance_interface', '!=', 'datev')]}"/>
+        </field>
       </field>
     </record>
 
