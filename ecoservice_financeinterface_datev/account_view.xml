@@ -93,6 +93,9 @@
         		<field name="ecofi_taxid" position="after">
         			<field name="ecofi_bu" select="2"/>
         		</field>
+				<field name="date" position="after">
+				  <field name="enable_datev_checks"/>
+				</field>
         	</field>
     	</record>
    	</data>

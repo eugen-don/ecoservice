@@ -31,6 +31,7 @@
             <field name="type">form</field>
             <field name="arch" type="xml">
                 <field name="finance_interface" position="after">
+                    <field name="enable_datev_checks" attrs="{'invisible': [('finance_interface', '!=', 'datev')]}"/>
                     <field name="exportmethod" colspan ="4" attrs="{'invisible' : [('finance_interface','!=','datev')]}"/>
                 </field>
             </field>

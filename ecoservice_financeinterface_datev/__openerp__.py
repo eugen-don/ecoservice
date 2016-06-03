@@ -22,7 +22,7 @@
 ##############################################################################
 {# pylint: disable-msg=W0104
     "name" : "Ecoservice Financial Interface Datev",
-    "version" : "1.0",
+    "version" : "9.0.1.1",
     "depends" : ["ecoservice_financeinterface", "mail"],
     "author" : "ecoservice",
     "website" : "www.ecoservice.de",
@@ -42,6 +42,8 @@ Further information under
                     'account_view.xml',
                     'account_cron.xml',
                     'res_company_view.xml',
+                    'account_invoice_view.xml',
+                    'workflow/account_invoice_workflow.xml',
                     #'ecoservice_financeinterface_datev_installer_view.xml'
                     ],
     "demo_xml" : [],
